@@ -1,0 +1,609 @@
+{
+  "version": 1,
+  "created_for": "Haidian heat-risk facility siting agent",
+  "notes": [
+    "This file is retained as a literature reference library and is not loaded by the runtime simulation.",
+    "The runtime does not use literature weights to determine agent, trip-type or trip-purpose shares.",
+    "Parameter ranges should be updated when Beijing- or Haidian-specific survey data are available.",
+    "The LLM may only choose within the allowed behavior set defined by runtime rules."
+  ],
+  "sources": {
+    "BJ_TDR_2012": {
+      "title": "2012 北京市交通发展年度报告",
+      "url": "https://jtw.beijing.gov.cn/xxgk/jttj/201207/P020190917505403793681.pdf",
+      "type": "official_report",
+      "usable_for": [
+        "aggregate_trip_purpose_share",
+        "travel_time_distribution",
+        "school_escort_and_life_service_trip_constraints"
+      ],
+      "parameters_used": {
+        "shopping_trip_share_reference": 0.076,
+        "recreation_fitness_trip_share_reference": 0.065,
+        "escort_trip_share_reference": 0.046,
+        "school_trip_share_reference": 0.036
+      }
+    },
+    "ELDERLY_NANJING_2020": {
+      "title": "Transport for the Elderly: Activity Patterns, Mode Choices, and Spatiotemporal Constraints",
+      "url": "https://www.mdpi.com/2071-1050/12/23/10024",
+      "doi": "10.3390/su122310024",
+      "type": "peer_reviewed_article",
+      "usable_for": [
+        "elderly_activity_chain",
+        "elderly_recreation_shopping_pattern",
+        "grandparent_school_dropoff_pickup_pattern",
+        "elderly_destination_preferences"
+      ],
+      "parameters_used": {
+        "elderly_recreation_shopping_oriented": true,
+        "elderly_school_dropoff_pickup_oriented": true,
+        "elderly_prefers_vegetable_markets_open_space_parks": true
+      }
+    },
+    "BEIJING_SCHOOL_TRAVEL_2017": {
+      "title": "School travel mode choice in Beijing, China",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0966692316304859",
+      "doi": "10.1016/j.jtrangeo.2017.06.001",
+      "type": "peer_reviewed_article",
+      "usable_for": [
+        "school_commute_mode_choice",
+        "student_trip_time_rigidity",
+        "escort_trip_sensitivity"
+      ],
+      "parameters_used": {
+        "student_school_trip_is_fixed_time": true,
+        "household_and_built_environment_affect_mode_choice": true
+      }
+    },
+    "BEIJING_ELEMENTARY_COMMUTE_2019": {
+      "title": "Exploring Behavioral Heterogeneities of Elementary School Students' Commute Mode Choices Through the Urban Travel Big Data of Beijing, China",
+      "url": "https://www.researchgate.net/publication/330921166_Exploring_Behavioral_Heterogeneities_of_Elementary_School_Students%27_Commute_Mode_Choices_Through_the_Urban_Travel_Big_Data_of_Beijing_China",
+      "doi": "10.1109/ACCESS.2019.2897890",
+      "type": "peer_reviewed_article",
+      "usable_for": [
+        "elementary_school_commute_mode_heterogeneity",
+        "school_related_trip_generation"
+      ],
+      "parameters_used": {
+        "elementary_school_commute_modes_include_walk_bike_ebike_public_transport_car": true
+      }
+    },
+    "HAIDIAN_EDU_2025": {
+      "title": "海淀区教育委员会 2024-2025 学年基础教育办学规模统计",
+      "url": "https://zyk.bjhd.gov.cn/jbdt/auto4489_51785/zdly/202504/t20250409_4764168_hd.shtml",
+      "type": "official_statistics",
+      "usable_for": [
+        "school_related_trip_volume",
+        "escort_trip_scenario_constraints"
+      ],
+      "parameters_used": {
+        "total_students": 415000,
+        "preschool_children": 68000,
+        "primary_students": 207000,
+        "junior_high_students": 83000,
+        "senior_high_students": 54000,
+        "kindergartens": 220,
+        "ordinary_primary_secondary_schools": 181
+      }
+    },
+    "ACTIVITY_BASED_MODEL_2001": {
+      "title": "Activity-based disaggregate travel demand model system with activity schedules",
+      "url": "https://doi.org/10.1016/S0965-8564(00)00042-9",
+      "doi": "10.1016/S0965-8564(00)00042-9",
+      "type": "peer_reviewed_article",
+      "usable_for": [
+        "mandatory_maintenance_discretionary_activity_classification",
+        "person_role_based_agent_classification",
+        "student_worker_nonworker_activity_constraints"
+      ],
+      "parameters_used": {
+        "activity_classes_include_mandatory_maintenance_discretionary": true,
+        "person_roles_support_student_worker_household_maintainer_categories": true
+      }
+    },
+    "HAIDIAN_POI_CONTEXT": {
+      "title": "Haidian POI-derived local context for universities, residential services and cooling candidate facilities",
+      "type": "project_dataset",
+      "usable_for": [
+        "university_destination_proxy",
+        "household_maintenance_destination_proxy",
+        "cooling_facility_candidate_proxy"
+      ],
+      "parameters_used": {
+        "poi_groups_used": ["children_related", "meal_grocery", "health_support", "transit", "green_blue", "cooling_potential"]
+      }
+    }
+  },
+  "agent_type_weights": {
+    "elderly_living_alone": {
+      "weight": 0.18,
+      "source_ids": ["ELDERLY_NANJING_2020"],
+      "reason": "Represents elderly recreation, shopping, medicine and short outdoor activities."
+    },
+    "elderly_chronic_disease": {
+      "weight": 0.13,
+      "source_ids": ["ELDERLY_NANJING_2020"],
+      "reason": "Represents high-sensitivity elderly medical and medicine trips."
+    },
+    "child_parent": {
+      "weight": 0.16,
+      "source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017", "BEIJING_ELEMENTARY_COMMUTE_2019"],
+      "label": "学生照护者",
+      "reason": "Represents adults with school escort and child-care travel responsibility, including parents and grandparents."
+    },
+    "university_student": {
+      "weight": 0.08,
+      "source_ids": ["ACTIVITY_BASED_MODEL_2001", "HAIDIAN_POI_CONTEXT"],
+      "label": "高校学生",
+      "reason": "Represents student-role mandatory campus travel and flexible campus-area activities in Haidian's university-concentrated environment."
+    },
+    "household_maintainer": {
+      "weight": 0.09,
+      "source_ids": ["ACTIVITY_BASED_MODEL_2001", "BJ_TDR_2012"],
+      "label": "家庭维护型成年人",
+      "reason": "Represents maintenance activities such as grocery shopping, medicine pickup, short shopping and care-related trips."
+    },
+    "outdoor_worker": {
+      "weight": 0.13,
+      "source_ids": ["BJ_TDR_2012"],
+      "reason": "Proxy group generated from delivery, logistics, road and service POIs."
+    },
+    "commuter": {
+      "weight": 0.23,
+      "source_ids": ["BJ_TDR_2012"],
+      "reason": "Represents fixed-time transit access and commute-related heat exposure."
+    }
+  },
+  "trip_type_weights_by_agent": {
+    "elderly_living_alone": {
+      "flexible_necessary": {
+        "weight": 0.55,
+        "source_ids": ["ELDERLY_NANJING_2020"],
+        "reason": "Elderly shopping and medicine trips are necessary but time-flexible."
+      },
+      "leisure": {
+        "weight": 0.45,
+        "source_ids": ["ELDERLY_NANJING_2020"],
+        "reason": "Recreation-shopping-oriented elderly pattern."
+      }
+    },
+    "elderly_chronic_disease": {
+      "flexible_necessary": {
+        "weight": 0.55,
+        "source_ids": ["ELDERLY_NANJING_2020"],
+        "reason": "Medicine and community health trips."
+      },
+      "fixed_time_necessary": {
+        "weight": 0.20,
+        "source_ids": ["ELDERLY_NANJING_2020"],
+        "reason": "Scheduled medical visits and time-constrained errands."
+      },
+      "accompanied_trip": {
+        "weight": 0.25,
+        "source_ids": ["ELDERLY_NANJING_2020"],
+        "reason": "High-sensitivity elderly may need accompanied trips."
+      }
+    },
+    "child_parent": {
+      "fixed_time_necessary": {
+        "weight": 0.65,
+        "source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017"],
+        "reason": "School escort and school commute are fixed-time trips."
+      },
+      "accompanied_trip": {
+        "weight": 0.25,
+        "source_ids": ["BEIJING_SCHOOL_TRAVEL_2017"],
+        "reason": "Child-related trips often involve adults or grandparents."
+      },
+      "leisure": {
+        "weight": 0.10,
+        "source_ids": ["BJ_TDR_2012"],
+        "reason": "Child-related leisure has lower necessity and higher heat sensitivity."
+      }
+    },
+    "university_student": {
+      "fixed_time_necessary": {
+        "weight": 0.45,
+        "source_ids": ["ACTIVITY_BASED_MODEL_2001"],
+        "reason": "Student-role campus attendance and transit access are mandatory time-structured activities."
+      },
+      "leisure": {
+        "weight": 0.35,
+        "source_ids": ["ACTIVITY_BASED_MODEL_2001", "HAIDIAN_POI_CONTEXT"],
+        "reason": "Campus-area recreation and park activities are discretionary and heat-adjustable."
+      },
+      "flexible_necessary": {
+        "weight": 0.20,
+        "source_ids": ["ACTIVITY_BASED_MODEL_2001", "BJ_TDR_2012"],
+        "reason": "Short shopping and service trips are maintenance activities with moderate time flexibility."
+      }
+    },
+    "household_maintainer": {
+      "flexible_necessary": {
+        "weight": 0.60,
+        "source_ids": ["ACTIVITY_BASED_MODEL_2001", "BJ_TDR_2012"],
+        "reason": "Household maintenance is represented by grocery, medicine and short shopping trips."
+      },
+      "accompanied_trip": {
+        "weight": 0.25,
+        "source_ids": ["ACTIVITY_BASED_MODEL_2001", "ELDERLY_NANJING_2020", "BEIJING_SCHOOL_TRAVEL_2017"],
+        "reason": "Household maintainers may escort elderly people or children for care-related activities."
+      },
+      "leisure": {
+        "weight": 0.15,
+        "source_ids": ["BJ_TDR_2012"],
+        "reason": "Some non-mandatory local activities can be delayed, shortened or substituted under heat."
+      }
+    },
+    "outdoor_worker": {
+      "outdoor_work": {
+        "weight": 1.0,
+        "source_ids": ["BJ_TDR_2012"],
+        "reason": "Outdoor worker is represented as a continuous outdoor-work trip class."
+      }
+    },
+    "commuter": {
+      "fixed_time_necessary": {
+        "weight": 1.0,
+        "source_ids": ["BJ_TDR_2012"],
+        "reason": "Commute and transit-access trips are fixed-time necessary trips."
+      }
+    }
+  },
+  "trip_purpose_weights": {
+    "fixed_time_necessary": {
+      "接送儿童": {
+        "weight": 0.40,
+        "source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017"]
+      },
+      "高校通学": {
+        "weight": 0.10,
+        "source_ids": ["ACTIVITY_BASED_MODEL_2001", "HAIDIAN_POI_CONTEXT"]
+      },
+      "通勤接驳": {
+        "weight": 0.35,
+        "source_ids": ["BJ_TDR_2012"]
+      },
+      "预约就医": {
+        "weight": 0.15,
+        "source_ids": ["ELDERLY_NANJING_2020"]
+      }
+    },
+    "flexible_necessary": {
+      "买菜": {
+        "weight": 0.45,
+        "source_ids": ["ELDERLY_NANJING_2020", "BJ_TDR_2012"]
+      },
+      "买药": {
+        "weight": 0.30,
+        "source_ids": ["ELDERLY_NANJING_2020"]
+      },
+      "助餐": {
+        "weight": 0.25,
+        "source_ids": ["ELDERLY_NANJING_2020"]
+      }
+    },
+    "leisure": {
+      "散步": {
+        "weight": 0.38,
+        "source_ids": ["ELDERLY_NANJING_2020"]
+      },
+      "公园活动": {
+        "weight": 0.34,
+        "source_ids": ["ELDERLY_NANJING_2020", "BJ_TDR_2012"]
+      },
+      "校园活动": {
+        "weight": 0.10,
+        "source_ids": ["ACTIVITY_BASED_MODEL_2001", "HAIDIAN_POI_CONTEXT"]
+      },
+      "短时购物": {
+        "weight": 0.18,
+        "source_ids": ["BJ_TDR_2012"]
+      }
+    },
+    "outdoor_work": {
+      "配送": {
+        "weight": 0.45,
+        "source_ids": ["BJ_TDR_2012"]
+      },
+      "快递": {
+        "weight": 0.35,
+        "source_ids": ["BJ_TDR_2012"]
+      },
+      "巡查": {
+        "weight": 0.20,
+        "source_ids": ["BJ_TDR_2012"]
+      }
+    },
+    "accompanied_trip": {
+      "陪老人就医": {
+        "weight": 0.45,
+        "source_ids": ["ELDERLY_NANJING_2020"]
+      },
+      "带儿童活动": {
+        "weight": 0.55,
+        "source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017"]
+      }
+    }
+  },
+  "trip_purpose_weights_by_agent": {
+    "elderly_living_alone": {
+      "flexible_necessary": {
+        "买菜": {
+          "weight": 0.50,
+          "source_ids": ["ELDERLY_NANJING_2020", "BJ_TDR_2012"]
+        },
+        "买药": {
+          "weight": 0.30,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        },
+        "助餐": {
+          "weight": 0.20,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        }
+      },
+      "leisure": {
+        "散步": {
+          "weight": 0.55,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        },
+        "公园活动": {
+          "weight": 0.35,
+          "source_ids": ["ELDERLY_NANJING_2020", "BJ_TDR_2012"]
+        },
+        "短时购物": {
+          "weight": 0.10,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      }
+    },
+    "elderly_chronic_disease": {
+      "fixed_time_necessary": {
+        "预约就医": {
+          "weight": 1.00,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        }
+      },
+      "flexible_necessary": {
+        "买药": {
+          "weight": 0.55,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        },
+        "买菜": {
+          "weight": 0.25,
+          "source_ids": ["ELDERLY_NANJING_2020", "BJ_TDR_2012"]
+        },
+        "助餐": {
+          "weight": 0.20,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        }
+      },
+      "accompanied_trip": {
+        "陪老人就医": {
+          "weight": 0.85,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        },
+        "带儿童活动": {
+          "weight": 0.15,
+          "source_ids": ["ELDERLY_NANJING_2020", "HAIDIAN_EDU_2025"]
+        }
+      }
+    },
+    "child_parent": {
+      "fixed_time_necessary": {
+        "接送儿童": {
+          "weight": 0.90,
+          "source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017"]
+        },
+        "通勤接驳": {
+          "weight": 0.10,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      },
+      "accompanied_trip": {
+        "带儿童活动": {
+          "weight": 0.90,
+          "source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017"]
+        },
+        "陪老人就医": {
+          "weight": 0.10,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        }
+      },
+      "leisure": {
+        "公园活动": {
+          "weight": 0.55,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "短时购物": {
+          "weight": 0.25,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "散步": {
+          "weight": 0.20,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      }
+    },
+    "university_student": {
+      "fixed_time_necessary": {
+        "高校通学": {
+          "weight": 0.75,
+          "source_ids": ["ACTIVITY_BASED_MODEL_2001", "HAIDIAN_POI_CONTEXT"]
+        },
+        "通勤接驳": {
+          "weight": 0.25,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      },
+      "flexible_necessary": {
+        "短时购物": {
+          "weight": 0.50,
+          "source_ids": ["BJ_TDR_2012", "HAIDIAN_POI_CONTEXT"]
+        },
+        "买菜": {
+          "weight": 0.30,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "买药": {
+          "weight": 0.20,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      },
+      "leisure": {
+        "校园活动": {
+          "weight": 0.45,
+          "source_ids": ["ACTIVITY_BASED_MODEL_2001", "HAIDIAN_POI_CONTEXT"]
+        },
+        "公园活动": {
+          "weight": 0.35,
+          "source_ids": ["BJ_TDR_2012", "HAIDIAN_POI_CONTEXT"]
+        },
+        "短时购物": {
+          "weight": 0.20,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      }
+    },
+    "household_maintainer": {
+      "flexible_necessary": {
+        "买菜": {
+          "weight": 0.45,
+          "source_ids": ["ACTIVITY_BASED_MODEL_2001", "BJ_TDR_2012"]
+        },
+        "买药": {
+          "weight": 0.25,
+          "source_ids": ["ACTIVITY_BASED_MODEL_2001", "ELDERLY_NANJING_2020"]
+        },
+        "短时购物": {
+          "weight": 0.20,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "助餐": {
+          "weight": 0.10,
+          "source_ids": ["ELDERLY_NANJING_2020"]
+        }
+      },
+      "accompanied_trip": {
+        "陪老人就医": {
+          "weight": 0.55,
+          "source_ids": ["ELDERLY_NANJING_2020", "ACTIVITY_BASED_MODEL_2001"]
+        },
+        "带儿童活动": {
+          "weight": 0.45,
+          "source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017"]
+        }
+      },
+      "leisure": {
+        "散步": {
+          "weight": 0.35,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "公园活动": {
+          "weight": 0.35,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "短时购物": {
+          "weight": 0.30,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      }
+    },
+    "outdoor_worker": {
+      "outdoor_work": {
+        "配送": {
+          "weight": 0.45,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "快递": {
+          "weight": 0.35,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "巡查": {
+          "weight": 0.20,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      }
+    },
+    "commuter": {
+      "fixed_time_necessary": {
+        "通勤接驳": {
+          "weight": 0.95,
+          "source_ids": ["BJ_TDR_2012"]
+        },
+        "短时购物": {
+          "weight": 0.05,
+          "source_ids": ["BJ_TDR_2012"]
+        }
+      }
+    }
+  },
+  "school_escort_scenarios": {
+    "low": {
+      "kindergarten": 0.70,
+      "primary": 0.40,
+      "junior_high": 0.10,
+      "senior_high": 0.05
+    },
+    "medium": {
+      "kindergarten": 0.80,
+      "primary": 0.55,
+      "junior_high": 0.20,
+      "senior_high": 0.08
+    },
+    "high": {
+      "kindergarten": 0.90,
+      "primary": 0.70,
+      "junior_high": 0.30,
+      "senior_high": 0.15
+    }
+  },
+  "activity_necessity_by_purpose": {
+    "接送儿童": 0.95,
+    "高校通学": 0.85,
+    "校园活动": 0.35,
+    "通勤接驳": 0.95,
+    "预约就医": 0.95,
+    "买菜": 0.80,
+    "买药": 0.90,
+    "助餐": 0.85,
+    "散步": 0.25,
+    "公园活动": 0.25,
+    "短时购物": 0.40,
+    "配送": 1.00,
+    "快递": 1.00,
+    "巡查": 0.95,
+    "陪老人就医": 0.95,
+    "带儿童活动": 0.70
+  },
+  "rl_reward_design": {
+    "status": "recommended_as_calibration_layer_after_baseline_validation",
+    "reward_components": {
+      "match_trip_purpose_distribution": {
+        "weight": 0.25,
+        "target_source_ids": ["BJ_TDR_2012"]
+      },
+      "match_school_escort_scenarios": {
+        "weight": 0.15,
+        "target_source_ids": ["HAIDIAN_EDU_2025", "BEIJING_SCHOOL_TRAVEL_2017"]
+      },
+      "match_elderly_activity_pattern": {
+        "weight": 0.20,
+        "target_source_ids": ["ELDERLY_NANJING_2020"]
+      },
+      "penalize_impossible_actions": {
+        "weight": 0.20,
+        "target_source_ids": ["agent_action_constraints"]
+      },
+      "penalize_unrealistic_detour": {
+        "weight": 0.10,
+        "target_source_ids": ["agent_trip_type_constraints"]
+      },
+      "improve_counterfactual_heat_exposure_reduction": {
+        "weight": 0.10,
+        "target_source_ids": ["project_validation"]
+      }
+    }
+  }
+}

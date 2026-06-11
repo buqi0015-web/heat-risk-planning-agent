@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "status": "initial_operational_priors_require_field_calibration",
+  "default": {
+    "capacity_visits_per_hour": 20,
+    "open_intervals": ["08:00-20:00"],
+    "base_use_probability": 0.45
+  },
+  "candidate_role": {
+    "core": {
+      "capacity_visits_per_hour": 80,
+      "open_intervals": ["08:00-21:00"],
+      "base_use_probability": 0.7
+    },
+    "support": {
+      "capacity_visits_per_hour": 25,
+      "open_intervals": ["09:00-18:00"],
+      "base_use_probability": 0.5
+    }
+  },
+  "publicness_multiplier": {
+    "high": 1.0,
+    "medium": 0.75,
+    "low": 0.45
+  },
+  "function_use_probability": {
+    "清凉中心": 0.8,
+    "清凉驿站": 0.7,
+    "遮阴": 0.9,
+    "饮水": 0.75,
+    "公厕": 0.6,
+    "助餐": 0.65,
+    "健康服务": 0.55,
+    "充电补给": 0.5
+  },
+  "trip_type_use_multiplier": {
+    "fixed_time_necessary": 0.35,
+    "flexible_necessary": 0.75,
+    "leisure": 0.9,
+    "outdoor_work": 0.8,
+    "accompanied_trip": 0.55
+  },
+  "capacity_model": "expected hourly demand divided by capacity; effectiveness is multiplied by min(1, capacity/demand)",
+  "simulated_activity_to_hourly_demand_expansion_factor": 50,
+  "applicability_note": "These values are transparent operational priors. Replace them with facility surveys, opening-hour directories, or observed use counts when available."
+}

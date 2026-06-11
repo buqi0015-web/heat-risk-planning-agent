@@ -1,0 +1,2 @@
+"""Synthetic resident agent modules."""
+
