@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="850" viewBox="0 0 1800 850">
+  <defs><filter id="s"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity=".12"/></filter><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#365449"/></marker><style>text{font-family:"Microsoft YaHei",Arial;fill:#182720}.t{font-size:38px;font-weight:700}.st{font-size:19px;fill:#65736d}.h{font-size:22px;font-weight:700}.b{font-size:17px}.n{font-size:19px;font-weight:700;fill:#fff}.box{stroke:#2f493e;stroke-width:2;rx:14;filter:url(#s)}.ln{stroke:#365449;stroke-width:4;fill:none;marker-end:url(#a)}</style></defs>
+  <rect width="1800" height="850" fill="#f4f6f3"/>
+  <text x="70" y="72" class="t">核心用户旅程：从一句居民诉求到一张规划行动卡</text>
+  <text x="70" y="110" class="st">产品将复杂空间分析隐藏在Agent工作流中，规划师围绕问题、证据和方案完成审议</text>
+  <g><circle cx="160" cy="205" r="28" fill="#e56c3e"/><text x="153" y="213" class="n">1</text><rect class="box" x="70" y="250" width="300" height="270" fill="#fff5dc"/><text x="100" y="300" class="h">提交问题</text><text x="100" y="345" class="b">居民：下午接孩子时</text><text x="100" y="377" class="b">学校门口太晒，附近</text><text x="100" y="409" class="b">有商场但来不及进去</text><text x="100" y="468" class="st">输入：自然语言 / 选定区域</text></g>
+  <path class="ln" d="M370 385H455"/>
+  <g><circle cx="545" cy="205" r="28" fill="#4b81c4"/><text x="538" y="213" class="n">2</text><rect class="box" x="455" y="250" width="300" height="270" fill="#e7f3ff"/><text x="485" y="300" class="h">AI转译任务</text><text x="485" y="345" class="b">识别：儿童照护者</text><text x="485" y="377" class="b">活动：固定时间接送</text><text x="485" y="409" class="b">需求：原位短时遮阴</text><text x="485" y="468" class="st">输出：问题卡与核验清单</text></g>
+  <path class="ln" d="M755 385H840"/>
+  <g><circle cx="930" cy="205" r="28" fill="#2f8a69"/><text x="923" y="213" class="n">3</text><rect class="box" x="840" y="250" width="300" height="270" fill="#e9f6f0"/><text x="870" y="300" class="h">调用专业工具</text><text x="870" y="345" class="b">核验学校入口与路径</text><text x="870" y="377" class="b">检查高温、树冠与设施</text><text x="870" y="409" class="b">识别失效位置及原因</text><text x="870" y="468" class="st">输出：可追溯证据包</text></g>
+  <path class="ln" d="M1140 385H1225"/>
+  <g><circle cx="1315" cy="205" r="28" fill="#9c6bc2"/><text x="1308" y="213" class="n">4</text><rect class="box" x="1225" y="250" width="300" height="270" fill="#f4ecfa"/><text x="1255" y="300" class="h">生成方案并推演</text><text x="1255" y="345" class="b">匹配存量设施能力</text><text x="1255" y="377" class="b">比较原位遮阴与驿站</text><text x="1255" y="409" class="b">展示潜在改善与限制</text><text x="1255" y="468" class="st">输出：候选方案对比</text></g>
+  <path class="ln" d="M1525 385H1610"/>
+  <g><circle cx="1700" cy="205" r="28" fill="#cf9640"/><text x="1693" y="213" class="n">5</text><rect class="box" x="1610" y="250" width="160" height="270" fill="#fff"/><text x="1635" y="300" class="h">规划师审议</text><text x="1635" y="345" class="b">确认优先级</text><text x="1635" y="377" class="b">补充现场信息</text><text x="1635" y="409" class="b">形成行动计划</text><text x="1635" y="468" class="st">人机协同决策</text></g>
+  <rect x="70" y="610" width="1700" height="120" rx="14" fill="#17251f"/>
+  <text x="105" y="660" font-family="Microsoft YaHei,Arial" font-size="23" font-weight="700" style="fill:#fff">Agent持续记录：用户输入、调用工具、使用证据、生成结论、触发回退、规划师修订</text>
+  <text x="105" y="700" font-family="Microsoft YaHei,Arial" font-size="18" style="fill:#b8c8c1">目标：让AI输出可解释、可回溯、可复核，并能够进入真实规划讨论</text>
+</svg>

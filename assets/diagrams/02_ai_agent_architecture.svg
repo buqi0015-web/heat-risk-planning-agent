@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+  <defs>
+    <filter id="s"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity=".11"/></filter>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#38564b"/></marker>
+    <style>text{font-family:"Microsoft YaHei",Arial;fill:#182720}.t{font-size:38px;font-weight:700}.st{font-size:19px;fill:#65736d}.h{font-size:23px;font-weight:700}.b{font-size:18px}.box{stroke:#2f493e;stroke-width:2;rx:12;filter:url(#s)}.ln{stroke:#38564b;stroke-width:3;fill:none;marker-end:url(#a)}</style>
+  </defs>
+  <rect width="1600" height="980" fill="#f4f6f3"/>
+  <text x="70" y="70" class="t">受约束规划 Agent：AI 与专业工具如何协作</text>
+  <text x="70" y="108" class="st">LLM负责理解、组织与解释；专业工具负责空间事实与数值；规划师负责最终判断</text>
+  <rect class="box" x="70" y="165" width="310" height="165" fill="#fff5dc"/>
+  <text x="100" y="210" class="h">用户与任务入口</text><text x="100" y="250" class="b">居民诉求 / 规划师问题</text><text x="100" y="282" class="b">目标、范围与约束条件</text><text x="100" y="313" class="st">下一版本重点</text>
+  <path class="ln" d="M380 247H500"/>
+  <rect class="box" x="500" y="145" width="600" height="205" fill="#e7f3ff"/>
+  <text x="540" y="195" class="h">LLM Agent 编排与推理层</text>
+  <text x="540" y="237" class="b">① 识别任务意图并拆解子任务</text><text x="540" y="271" class="b">② 读取结构化上下文与可用工具</text><text x="540" y="305" class="b">③ 组织证据、解释冲突、生成行动卡</text><text x="540" y="335" class="st">当前已实现：受约束行为决策、解释、日志、回退与消融</text>
+  <path class="ln" d="M1100 247H1220"/>
+  <rect class="box" x="1220" y="165" width="310" height="165" fill="#e9f6f0"/>
+  <text x="1250" y="210" class="h">规划师审议</text><text x="1250" y="250" class="b">确认事实与待核验项</text><text x="1250" y="282" class="b">比较方案与实施条件</text><text x="1250" y="313" class="st">保留最终决策权</text>
+  <path class="ln" d="M800 350V430"/>
+  <rect class="box" x="85" y="430" width="310" height="180" fill="#fff"/>
+  <text x="115" y="475" class="h">空间事实工具</text><text x="115" y="515" class="b">GIS空间核验</text><text x="115" y="547" class="b">POI与用地语义审查</text><text x="115" y="579" class="b">真实步行路网路径</text>
+  <rect class="box" x="455" y="430" width="310" height="180" fill="#fff"/>
+  <text x="485" y="475" class="h">活动诊断工具</text><text x="485" y="515" class="b">居民与活动情景生成</text><text x="485" y="547" class="b">路径热暴露计算</text><text x="485" y="579" class="b">活动失效位置识别</text>
+  <rect class="box" x="825" y="430" width="310" height="180" fill="#fff"/>
+  <text x="855" y="475" class="h">设施评估工具</text><text x="855" y="515" class="b">功能与需求匹配</text><text x="855" y="547" class="b">开放时间与容量约束</text><text x="855" y="579" class="b">实施前后情景比较</text>
+  <rect class="box" x="1195" y="430" width="310" height="180" fill="#fff"/>
+  <text x="1225" y="475" class="h">可信AI护栏</text><text x="1225" y="515" class="b">动作白名单与JSON校验</text><text x="1225" y="547" class="b">禁止修改空间事实</text><text x="1225" y="579" class="b">异常回退与决策日志</text>
+  <path class="ln" d="M240 610V705H740"/><path class="ln" d="M610 610V680H760"/><path class="ln" d="M980 610V680H840"/><path class="ln" d="M1350 610V705H860"/>
+  <rect class="box" x="435" y="705" width="730" height="155" fill="#17251f"/>
+  <text x="475" y="755" font-family="Microsoft YaHei,Arial" font-size="24" font-weight="700" style="fill:#fff">统一证据包与规划行动卡</text>
+  <text x="475" y="797" font-family="Microsoft YaHei,Arial" font-size="19" style="fill:#dbe8e2">已验证事实 · 模型推断 · 方案收益 · 利益冲突 · 待现场核验项</text>
+  <text x="475" y="832" font-family="Microsoft YaHei,Arial" font-size="17" style="fill:#a9bbb3">每个结论能够回溯到居民活动、路径、设施与Agent决策日志</text>
+</svg>
