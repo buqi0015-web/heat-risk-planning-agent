@@ -133,6 +133,6 @@ DEEPSEEK_API_KEY=your_key_here
 
 ## 数据说明
 
-公开 Demo 仅包含精简、预计算的代表性结果。完整原始数据和大规模实验输出未纳入仓库。底图来自 OpenStreetMap，其他数据源及方法详见完整 PRD。
+公开 Demo 仅包含精简、预计算的代表性活动结果。道路展示保留完整路网拓扑，通过压缩坐标精度和非必要属性控制体积；完整原始数据和大规模实验输出未纳入仓库。底图来自 OpenStreetMap，其他数据源及方法详见完整 PRD。
 
 ![产品路线图](assets/diagrams/04_product_roadmap.svg)

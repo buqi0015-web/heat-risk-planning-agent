@@ -6,6 +6,7 @@ node_modules/
 dist/
 *.log
 assets/deployment-check.png
+assets/road-network-*.png
 assets/diagrams/*.png
 /outputs/
 /data/
