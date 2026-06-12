@@ -2,22 +2,18 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import maplibregl from "maplibre-gl";
 import {
-  Activity,
   ArrowUpRight,
   Building2,
   CheckCircle2,
   CircleDot,
   Clock3,
-  Database,
   Footprints,
   Layers3,
-  Map,
   MapPin,
   Menu,
   Route,
   ShieldCheck,
   ThermometerSun,
-  UsersRound,
   X,
 } from "lucide-react";
 import {
@@ -49,7 +45,6 @@ const NAV_ITEMS = [
   { id: "route", label: "活动路线", icon: Route },
   { id: "selection", label: "设施选址", icon: Building2 },
   { id: "evidence", label: "气象与核验", icon: ShieldCheck },
-  { id: "method", label: "方法框架", icon: Database },
 ];
 
 const compactNumber = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 1 });
@@ -390,7 +385,7 @@ function Overview({ data, setActive, selectActivity }) {
   const counterfactualComplete = Boolean(data.counterfactual_validation?.completed);
   return (
     <section className="view">
-      <div className="view-heading">
+      <div className="view-heading view-heading--overview">
         <div><span className="eyebrow">城市规划诊断台</span><h1>从“哪里热”推进到<br />“谁的活动正在失效”</h1></div>
         <p>把道路热环境、居民活动目的、出行时间与真实路径放在同一分析框架中，识别需要优先获得清凉设施支持的活动与空间。</p>
       </div>
@@ -692,38 +687,6 @@ function EvidenceView({ data }) {
   );
 }
 
-function MethodView() {
-  return (
-    <section className="view">
-      <div className="view-heading view-heading--compact">
-        <div><span className="eyebrow">方法框架</span><h1>Agent 如何把热环境转译为设施选址需求</h1></div>
-        <p>空间热风险提供环境约束，居民 Agent 生成有目的、有时间、有路径的活动，失效识别结果进一步进入设施需求与选址。</p>
-      </div>
-      <div className="method-flow">
-        {[
-          ["01", "识别空间热环境", "LST、树冠、水体距离与道路环境"],
-          ["02", "生成居民活动", "居民类型、活动目的与出发时间"],
-          ["03", "执行真实路径", "POI 目的地与环境感知选路"],
-          ["04", "累计道路边暴露", "进入时间、高温重叠与脆弱性"],
-          ["05", "识别活动失效", "正常、调整、风险完成与失效"],
-          ["06", "转译设施需求", "位置、功能、人群与时间需求"],
-          ["07", "选址与反事实验证", "存量复用、新增补点与效果评估"],
-        ].map(([number, title, text]) => <div key={number}><span>{number}</span><strong>{title}</strong><p>{text}</p></div>)}
-      </div>
-      <div className="formula-grid">
-        <article><span className="panel-kicker">道路边暴露</span><div className="formula">Exposure<sub>g,e</sub> = H<sub>e</sub> × Δt<sup>heat</sup><sub>g,e</sub> × V<sub>g</sub></div><p>道路热压力 × 经过该道路时与高温时段重叠的分钟数 × 居民热脆弱性权重。</p></article>
-        <article><span className="panel-kicker">完整活动暴露</span><div className="formula">ActivityExposure<sub>g</sub> = RouteExposure<sub>g</sub> + DestinationExposure<sub>g</sub></div><p>同时考虑沿途移动暴露和目的地户外停留暴露，定位活动失效发生的主要空间。</p></article>
-      </div>
-      <div className="agent-grid">
-        {[["UsersRound", "行为生成", "依据居民类型、活动规则和公开统计约束生成日常活动。"], ["Map", "空间执行", "选择真实 POI 目的地，并在步行路网上执行路径选择。"], ["Activity", "需求转译", "把行为调整、风险完成与活动失效转译为设施功能需求。"]].map(([icon, title, text]) => {
-          const Icon = { UsersRound, Map, Activity }[icon];
-          return <article key={title}><Icon aria-hidden="true" size={21} /><h3>{title}</h3><p>{text}</p></article>;
-        })}
-      </div>
-    </section>
-  );
-}
-
 function App() {
   const [data, setData] = useState(null);
   const [active, setActive] = useState("overview");
@@ -746,7 +709,6 @@ function App() {
           {active === "route" && <RouteView data={data} selectedId={selectedId} setSelectedId={setSelectedId} />}
           {active === "selection" && <SelectionView data={data} />}
           {active === "evidence" && <EvidenceView data={data} />}
-          {active === "method" && <MethodView />}
         </main>
       </div>
     </div>
