@@ -385,9 +385,12 @@ function Overview({ data, setActive, selectActivity }) {
   const counterfactualComplete = Boolean(data.counterfactual_validation?.completed);
   return (
     <section className="view">
-      <div className="view-heading view-heading--overview">
-        <div><span className="eyebrow">城市规划诊断台</span><h1>从“哪里热”推进到<br />“谁的活动正在失效”</h1></div>
-        <p>把道路热环境、居民活动目的、出行时间与真实路径放在同一分析框架中，识别需要优先获得清凉设施支持的活动与空间。</p>
+      <div className="overview-header">
+        <div className="overview-header__intro">
+          <span className="eyebrow">城市规划诊断台</span>
+          <h1>识别高温中正在失效的居民活动</h1>
+        </div>
+        <p>综合道路热环境、居民活动目的、出行时间与真实路径，定位需要优先获得清凉设施支持的活动与空间。</p>
       </div>
       <div className="metric-strip">
         <Metric label="模拟居民" value={activities.reduce((set, item) => set.add(item.agent_id), new Set()).size} meta="7 类典型居民" />
