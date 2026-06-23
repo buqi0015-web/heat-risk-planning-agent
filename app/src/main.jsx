@@ -1,718 +1,1294 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import {
-  ArrowUpRight,
+  AlertTriangle,
   Building2,
   CheckCircle2,
-  CircleDot,
-  Clock3,
-  Footprints,
+  Download,
+  FileText,
   Layers3,
   MapPin,
   Menu,
   Route,
   ShieldCheck,
   ThermometerSun,
+  Users,
   X,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import "maplibre-gl/dist/maplibre-gl.css";
 import "./styles.css";
 
-const STATUS = {
-  normal: { label: "正常完成", color: "#26856b" },
-  behavior_changed: { label: "行为调整", color: "#d7a62a" },
-  risky_completion: { label: "风险完成", color: "#e07439" },
-  failed: { label: "活动失效", color: "#c4473c" },
-};
-
 const NAV_ITEMS = [
-  { id: "overview", label: "诊断总览", icon: Layers3 },
+  { id: "risk", label: "风险诊断", icon: ThermometerSun },
+  { id: "facility", label: "设施与活动核验", icon: Building2 },
   { id: "route", label: "活动路线", icon: Route },
-  { id: "selection", label: "设施选址", icon: Building2 },
-  { id: "evidence", label: "气象与核验", icon: ShieldCheck },
+  { id: "scenario", label: "反事实方案", icon: Layers3 },
+  { id: "export", label: "报告导出", icon: FileText },
 ];
 
-const compactNumber = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 1 });
-const percent = new Intl.NumberFormat("zh-CN", { style: "percent", maximumFractionDigits: 1 });
-const BASEMAP_STYLE = {
-  version: 8,
-  sources: {
-    "openstreetmap": {
-      type: "raster",
-      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-      tileSize: 256,
-      attribution: "© OpenStreetMap contributors",
-      maxzoom: 19,
-    },
-  },
-  layers: [
-    { id: "background", type: "background", paint: { "background-color": "#e9efec" } },
-    {
-      id: "openstreetmap",
-      type: "raster",
-      source: "openstreetmap",
-      paint: {
-        "raster-opacity": 0.76,
-        "raster-saturation": -0.55,
-        "raster-contrast": -0.08,
-        "raster-brightness-min": 0.18,
-        "raster-brightness-max": 0.98,
-      },
-    },
-  ],
+const metricCards = [
+  { label: "高温暴露人口", value: "12.8万人", meta: "午后高温时段暴露估计", tone: "danger" },
+  { label: "设施覆盖率", value: "64%", meta: "15分钟可达清凉设施", tone: "cool" },
+  { label: "平均步行绕行距离", value: "420m", meta: "到达清凉节点的额外距离", tone: "neutral" },
+  { label: "重点人群影响指数", value: "0.78", meta: "老人、儿童、户外劳动者", tone: "warning" },
+];
+
+const diagnosis = {
+  explanation:
+    "中关村、学院路和西三旗交界片区同时出现高温暴露、步行绕行和设施开放不足，风险不只来自“热”，也来自居民必须完成的通勤、就医、接送学和户外劳动活动。",
+  people: ["慢病老人", "接送学家庭", "户外劳动者", "午间通勤人群"],
+  gaps: ["遮阴连续性不足", "饮水点稀疏", "可进入休憩空间少", "存量公共设施开放时间不匹配"],
+  advice:
+    "优先复用党群服务中心、社区卫生服务站和公共文化空间，在高暴露道路补充遮阴、饮水与短暂停留点，并对学校、医院和换乘节点周边形成微型清凉网络。",
 };
 
-function addLocalPlanningBasemap(map, data, includeRoadContext = false) {
-  if (!data.local_landuse_basemap) return;
-  map.addSource("local-landuse-basemap", { type: "geojson", data: data.local_landuse_basemap });
-  map.addLayer({
-    id: "local-landuse-basemap",
-    type: "fill",
-    source: "local-landuse-basemap",
-    paint: {
-      "fill-color": [
-        "match", ["get", "Class"],
-        0, "#e7e5df",
-        1, "#d9e2e5",
-        2, "#ece0cc",
-        3, "#d7dadd",
-        4, "#d9ddda",
-        5, "#d7dadd",
-        6, "#e4dce5",
-        7, "#dbe6ed",
-        8, "#eadcdf",
-        9, "#e7e2cf",
-        10, "#d6e5d8",
-        "#e5e9e6",
-      ],
-      "fill-opacity": 0.66,
-      "fill-outline-color": "#f7f9f8",
-    },
-  });
-  if (includeRoadContext && data.roads) {
-    map.addSource("local-road-context", { type: "geojson", data: data.roads });
-    map.addLayer({
-      id: "local-road-context",
-      type: "line",
-      source: "local-road-context",
-      paint: {
-        "line-color": "#8d9994",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.45, 13, 1.3],
-        "line-opacity": 0.34,
-      },
-    });
-  }
-}
+const comparisonRows = [
+  { plan: "现状", coverage: "64%", exposure: "高", detour: "420m", recovery: "基准", note: "识别风险与缺口" },
+  { plan: "遮阴设施", coverage: "71%", exposure: "中高", detour: "390m", recovery: "+8%", note: "改善连续步行路径" },
+  { plan: "饮水点", coverage: "76%", exposure: "中", detour: "360m", recovery: "+11%", note: "服务户外劳动与通勤" },
+  { plan: "休憩点", coverage: "82%", exposure: "中", detour: "310m", recovery: "+16%", note: "支持老人、陪护和接送学" },
+  { plan: "路径优化", coverage: "79%", exposure: "中低", detour: "260m", recovery: "+14%", note: "引导低热暴露路径" },
+];
 
-function enableOfflineBasemapFallback(map) {
-  map.on("error", (event) => {
-    if (event.sourceId !== "openstreetmap" || !map.getLayer("openstreetmap")) return;
-    map.removeLayer("openstreetmap");
-    if (map.getSource("openstreetmap")) map.removeSource("openstreetmap");
-  });
-}
+const facilityChecks = [
+  {
+    name: "党群服务中心",
+    status: "优先复用",
+    service: "室内清凉驿站 + 临时照护",
+    evidence: "公共属性强，靠近居住区和高暴露道路",
+    check: "开放时段、室内容量、管理排班",
+  },
+  {
+    name: "社区卫生服务站",
+    status: "联动开放",
+    service: "慢病老人休息 + 饮水补给",
+    evidence: "与就医取药活动高度相关，可承接健康脆弱人群",
+    check: "候诊空间、午后开放、应急处置责任",
+  },
+  {
+    name: "公共文化空间",
+    status: "条件转化",
+    service: "休憩点 + 高温信息发布",
+    evidence: "具备停留空间，适合作为片区级补充节点",
+    check: "空调、座椅、无障碍和产权边界",
+  },
+  {
+    name: "公交站与路侧空间",
+    status: "谨慎改造",
+    service: "遮阴候停 + 短时补水",
+    evidence: "直接嵌入出行路径，能减少暴露中断成本",
+    check: "市政权属、道路安全、运维补水频率",
+  },
+];
 
-function Metric({ label, value, meta, accent = "neutral" }) {
+const activityCases = [
+  { person: "慢病老人", time: "09:30-11:00", activity: "就医、取药、买菜", constraint: "步速慢、热脆弱性高、目的地停留不可压缩", behavior: "倾向选择熟悉路径，绕行容忍低于 300m", planning: "医疗点和菜市场周边需要可进入休憩点" },
+  { person: "接送学家庭", time: "15:30-17:30", activity: "接送学、等待、短距离步行", constraint: "时间刚性强，停留位置由校门和等候区决定", behavior: "即使路过清凉设施，也可能因接送任务不进入", planning: "学校周边要优先补遮阴等候和短时座椅" },
+  { person: "户外劳动者", time: "11:00-16:00", activity: "配送、巡查、保洁", constraint: "路线连续、任务密集，暴露时间随订单或巡查段累积", behavior: "更需要沿途低成本短暂停留，不依赖目的地休憩", planning: "高暴露道路边需要饮水点和短停节点" },
+];
+
+const routeCases = [
+  {
+    id: "agent_000050_act_02",
+    label: "老人陪医取药",
+    origin: "北京市海淀医院",
+    destination: "中医医院采样点",
+    time: "11:37",
+    distance: "7.3km",
+    exposure: "198.7",
+    failed: "目的地停留热暴露高",
+    adjustment: "增加卫生服务站联动休憩点，路径优先经过遮阴道路",
+  },
+  {
+    id: "agent_000074_act_01",
+    label: "接送学陪护",
+    origin: "乘服公寓",
+    destination: "风车汇智学校",
+    time: "10:46",
+    distance: "1.5km",
+    exposure: "72.7",
+    failed: "学校周边等候暴露",
+    adjustment: "在学校周边 150m 范围内布置遮阴和短时座椅",
+  },
+  {
+    id: "agent_000040_act_02",
+    label: "户外配送",
+    origin: "菜鸟驿站",
+    destination: "果真鲜生活超市",
+    time: "14:55",
+    distance: "6.9km",
+    exposure: "63.9",
+    failed: "连续道路边热暴露",
+    adjustment: "沿高暴露路径设置饮水与短暂停留点",
+  },
+];
+
+const counterfactualCards = [
+  { name: "现状基线", exposure: "高", coverage: "64%", change: "无干预", note: "识别高温治理失效区域和主要受影响活动。" },
+  { name: "遮阴优先", exposure: "中高", coverage: "71%", change: "活动失效 -8%", note: "降低学校、公交站、医院周边等待暴露。" },
+  { name: "饮水点优先", exposure: "中", coverage: "76%", change: "户外劳动风险 -11%", note: "服务配送、巡查和午间通勤的连续路径。" },
+  { name: "存量复用组合", exposure: "中低", coverage: "82%", change: "设施覆盖 +18%", note: "将党群服务中心、卫生服务站转化为清凉节点。" },
+];
+
+const plannerGoalPresets = [
+  {
+    id: "elder-school",
+    label: "老人 + 接送学",
+    prompt: "优先保障老人和接送学家庭，应该在哪里布置清凉设施？",
+    layer: "facility",
+  },
+  {
+    id: "outdoor-workers",
+    label: "户外劳动者",
+    prompt: "针对配送、巡查和保洁等户外劳动者，如何布置连续饮水与短暂停留点？",
+    layer: "route",
+  },
+  {
+    id: "reuse-first",
+    label: "存量复用",
+    prompt: "如果优先复用党群服务中心、卫生服务站和公共文化空间，哪些点位最值得先改造？",
+    layer: "facility",
+  },
+];
+
+const dynamicPlanProfiles = {
+  "elder-school": {
+    intent: "识别出重点对象为慢病老人和接送学家庭，约束被转译为低绕行、近医疗与近学校、可停留、遮阴优先。",
+    weights: ["重点人群覆盖 +35%", "时间刚性 +25%", "绕行距离 +20%", "存量复用 +20%"],
+    recommendation:
+      "优先在学院路-中关村南部、学校周边等候空间、社区卫生服务站周边布置遮阴与短暂停留设施，形成可到达、可等待、可陪护的清凉节点。",
+    selected: [
+      { name: "学院路学校周边等候点", type: "遮阴 + 座椅", reason: "接送学活动时间刚性强，校门口附近绕行容忍最低。" },
+      { name: "社区卫生服务站联动点", type: "休憩 + 饮水", reason: "慢病老人就医路径需要短暂停留和健康服务联动。" },
+      { name: "党群服务中心复合点", type: "清凉驿站", reason: "具备公共服务属性，适合承接室内避暑和应急照护。" },
+    ],
+    risks: ["需核验学校周边可布置空间", "卫生服务站开放时间需确认", "党群服务中心容量需现场复核"],
+  },
+  "outdoor-workers": {
+    intent: "识别出重点对象为户外劳动者，约束被转译为沿路连续覆盖、补水便利、短暂停留和路径暴露中断。",
+    weights: ["高暴露路径中断 +40%", "饮水可达 +25%", "连续覆盖 +20%", "实施成本 +15%"],
+    recommendation:
+      "优先沿高暴露道路和配送巡查密集路径布置饮水点、遮阴候停点和短时休息点，降低连续道路边热暴露。",
+    selected: [
+      { name: "高暴露道路交汇点", type: "饮水 + 遮阴", reason: "路径经过频次高，能中断连续热暴露。" },
+      { name: "公交站复合候停点", type: "遮阴候车", reason: "具备公共性和路侧可达性，改造成本较低。" },
+      { name: "公园入口服务点", type: "短暂停留", reason: "靠近绿色空间，可作为补水和恢复节点。" },
+    ],
+    risks: ["路侧设施需核验市政权属", "饮水点运维主体需明确", "夜间开放能力暂未纳入"],
+  },
+  "reuse-first": {
+    intent: "识别出治理目标为低成本存量复用，约束被转译为公共性、开放时间、容量、道路可达和功能嵌入潜力。",
+    weights: ["存量复用潜力 +35%", "公共性 +25%", "设施容量 +20%", "需求覆盖 +20%"],
+    recommendation:
+      "优先从党群服务中心、公共文化空间、卫生服务站和交通节点中筛选可快速嵌入清凉功能的点位，形成首批低成本改造清单。",
+    selected: [
+      { name: "党群服务中心", type: "室内清凉驿站", reason: "公共属性强，适合成为街道级服务锚点。" },
+      { name: "公共文化空间", type: "休憩 + 信息发布", reason: "具备停留空间，可承接高温预警和临时避暑。" },
+      { name: "公交站点", type: "遮阴 + 饮水", reason: "靠近日常路径，适合补齐路侧短板。" },
+    ],
+    risks: ["需要现场核验空调与座椅", "开放时段可能与高温时段错位", "管理主体需街道协调"],
+  },
+};
+
+const strategyLabels = {
+  equity: "公平优先",
+  coverage: "覆盖优先",
+  reuse: "存量复用优先",
+  cost: "低成本优先",
+};
+
+const strategyColors = {
+  equity: "#0f8f8f",
+  coverage: "#ef5a3c",
+  reuse: "#1f7a4f",
+  cost: "#f4a340",
+};
+
+function MetricCard({ item }) {
   return (
-    <div className={`metric metric--${accent}`}>
-      <span className="metric__label">{label}</span>
-      <strong className="metric__value">{value}</strong>
-      <span className="metric__meta">{meta}</span>
-    </div>
+    <article className={`planner-metric planner-metric--${item.tone}`}>
+      <span>{item.label}</span>
+      <strong>{item.value}</strong>
+      <small>{item.meta}</small>
+    </article>
   );
 }
 
-function SelectionMap({ data, method, size }) {
-  const container = useRef(null);
-  useEffect(() => {
-    if (!container.current) return undefined;
-    const selected = {
-      type: "FeatureCollection",
-      features: data.site_selection.facility_scenarios_geojson.features.filter(
-        (feature) => feature.properties.scenario_method === method
-          && Number(feature.properties.scenario_size) === Number(size),
-      ),
-    };
-    const map = new maplibregl.Map({
-      container: container.current,
-      style: BASEMAP_STYLE,
-      center: [116.25, 40.01],
-      zoom: 10,
-      attributionControl: false,
-    });
-    enableOfflineBasemapFallback(map);
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.on("load", () => {
-      addLocalPlanningBasemap(map, data, true);
-      map.addSource("selection-boundary", { type: "geojson", data: data.boundary });
-      map.addLayer({
-        id: "selection-boundary",
-        type: "line",
-        source: "selection-boundary",
-        paint: { "line-color": "#2d6f83", "line-width": 1.5, "line-opacity": 0.8 },
-      });
-      map.addSource("hotspots", { type: "geojson", data: data.site_selection.failure_hotspots });
-      map.addLayer({
-        id: "hotspots",
-        type: "fill",
-        source: "hotspots",
-        paint: {
-          "fill-color": ["interpolate", ["linear"], ["get", "hotspot_priority"], 0, "#dce9e3", 0.5, "#e7a94c", 1, "#bd4a42"],
-          "fill-opacity": 0.58,
-          "fill-outline-color": "#ffffff",
-        },
-      });
-      map.addSource("selected-facilities", { type: "geojson", data: selected });
-      map.addLayer({
-        id: "selected-facilities",
-        type: "circle",
-        source: "selected-facilities",
-        paint: {
-          "circle-radius": ["case", ["==", ["get", "candidate_role"], "core"], 8, 6],
-          "circle-color": ["case", ["==", ["get", "candidate_role"], "core"], "#1f6675", "#f4f7f5"],
-          "circle-stroke-color": "#173f48",
-          "circle-stroke-width": 2,
-        },
-      });
-      map.on("click", "selected-facilities", (event) => {
-        const props = event.features?.[0]?.properties;
-        if (!props) return;
-        new maplibregl.Popup({ closeButton: false, offset: 8 })
-          .setLngLat(event.lngLat)
-          .setHTML(`<b>${props.poi_name}</b><span>${props.candidate_role === "core" ? "核心设施" : "路径支撑节点"}</span><span>建议功能 ${props.recommended_functions || props.function_categories}</span>`)
-          .addTo(map);
-      });
-      map.fitBounds([[116.17, 39.90], [116.395, 40.11]], { padding: 28, duration: 0 });
-    });
-    return () => map.remove();
-  }, [data, method, size]);
-  return <div ref={container} className="map-canvas" aria-label="失效热点与清凉设施选址地图" />;
-}
-
-function StatusPill({ status, label, color }) {
-  const item = STATUS[status] ?? { label: label ?? status, color: color ?? "#64716c" };
+function Sidebar({ active, setActive, open, setOpen }) {
   return (
-    <span className="status-pill" style={{ "--status-color": item.color }}>
-      <span aria-hidden="true" />
-      {item.label}
-    </span>
-  );
-}
-
-function MapView({ data, routeSegments = [], selectedActivity = null, mode = "heat" }) {
-  const container = useRef(null);
-  const mapRef = useRef(null);
-  const [mapReady, setMapReady] = useState(false);
-
-  useEffect(() => {
-    if (!container.current || !data) return undefined;
-    const map = new maplibregl.Map({
-      container: container.current,
-      style: BASEMAP_STYLE,
-      center: [116.22, 40.01],
-      zoom: 9.7,
-      attributionControl: false,
-    });
-    enableOfflineBasemapFallback(map);
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-left");
-    map.on("load", () => {
-      addLocalPlanningBasemap(map, data);
-      map.addSource("boundary", { type: "geojson", data: data.boundary });
-      map.addLayer({
-        id: "boundary-fill",
-        type: "fill",
-        source: "boundary",
-        paint: { "fill-color": "#2d6f83", "fill-opacity": 0.035 },
-      });
-      map.addLayer({
-        id: "boundary-line",
-        type: "line",
-        source: "boundary",
-        paint: { "line-color": "#2d6f83", "line-width": 1.4, "line-opacity": 0.8 },
-      });
-      map.addSource("roads", { type: "geojson", data: data.roads });
-      map.addLayer({
-        id: "roads",
-        type: "line",
-        source: "roads",
-        paint: {
-          "line-color": [
-            "case",
-            ["==", ["get", "has_heat_data"], 0],
-            "#aab5b0",
-            [
-              "interpolate", ["linear"], ["get", "effective_heat_stress"],
-              0, "#2b8871", 0.35, "#d1ad38", 0.65, "#e0713c", 1, "#bd3f38",
-            ],
-          ],
-          "line-width": ["interpolate", ["linear"], ["zoom"], 9, 1.05, 13, 3.2],
-          "line-opacity": mode === "heat" ? 0.82 : 0.14,
-        },
-      });
-      map.on("mouseenter", "roads", () => { map.getCanvas().style.cursor = "pointer"; });
-      map.on("mouseleave", "roads", () => { map.getCanvas().style.cursor = ""; });
-      map.on("click", "roads", (event) => {
-        const feature = event.features?.[0];
-        if (!feature) return;
-        const props = feature.properties;
-        new maplibregl.Popup({ closeButton: false, offset: 8 })
-          .setLngLat(event.lngLat)
-          .setHTML(props.has_heat_data === 1 || props.has_heat_data === "1"
-            ? `<b>${props.road_name || "未命名道路"}</b><span>LST ${Number(props.lst).toFixed(1)}°C</span><span>有效热压力 ${Number(props.effective_heat_stress).toFixed(2)}</span>`
-            : `<b>${props.road_name || "未命名道路"}</b><span>当前缺少完整热环境观测</span>`)
-          .addTo(map);
-      });
-      mapRef.current = map;
-      setMapReady(true);
-    });
-    return () => {
-      setMapReady(false);
-      map.remove();
-    };
-  }, [data, mode]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!mapReady || !map) return;
-    const drawRoute = () => {
-      if (map.getLayer("activity-route")) map.removeLayer("activity-route");
-      if (map.getSource("activity-route")) map.removeSource("activity-route");
-      for (const marker of document.querySelectorAll(".route-marker")) marker.remove();
-      if (!selectedActivity || routeSegments.length === 0) return;
-      const features = routeSegments.map((segment) => ({
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [[segment.from_lon, segment.from_lat], [segment.to_lon, segment.to_lat]],
-        },
-        properties: { exposure: segment.segment_heat_exposure ?? 0 },
-      }));
-      map.addSource("activity-route", { type: "geojson", data: { type: "FeatureCollection", features } });
-      map.addLayer({
-        id: "activity-route",
-        type: "line",
-        source: "activity-route",
-        paint: {
-          "line-color": ["interpolate", ["linear"], ["get", "exposure"], 0, "#267e9a", 0.3, "#f0ad32", 1.4, "#c4473c"],
-          "line-width": 5,
-          "line-opacity": 0.95,
-        },
-      });
-      const marker = (coordinates, kind) => {
-        const element = document.createElement("div");
-        element.className = `route-marker route-marker--${kind}`;
-        new maplibregl.Marker({ element }).setLngLat(coordinates).addTo(map);
-      };
-      marker([selectedActivity.origin_lon, selectedActivity.origin_lat], "origin");
-      marker([selectedActivity.destination_lon, selectedActivity.destination_lat], "destination");
-      const bounds = new maplibregl.LngLatBounds();
-      features.forEach((feature) => feature.geometry.coordinates.forEach((coordinate) => bounds.extend(coordinate)));
-      map.fitBounds(bounds, { padding: 72, maxZoom: 14, duration: 700 });
-    };
-    if (map.isStyleLoaded()) drawRoute();
-    else map.once("idle", drawRoute);
-    return () => map.off("idle", drawRoute);
-  }, [routeSegments, selectedActivity, mapReady]);
-
-  return <div ref={container} className="map-canvas" aria-label="海淀区热风险道路地图" />;
-}
-
-function Header({ active, setActive, menuOpen, setMenuOpen }) {
-  return (
-    <header className="topbar">
-      <button className="icon-button mobile-only" aria-label="打开导航" onClick={() => setMenuOpen(true)}>
-        <Menu aria-hidden="true" size={20} />
-      </button>
-      <div className="topbar__context">
-        <span>海淀区 · 2024 夏季</span>
-        <strong>{NAV_ITEMS.find((item) => item.id === active)?.label}</strong>
-      </div>
-      <div className="topbar__status"><span aria-hidden="true" />阶段成果 · 模型验证运行</div>
-    </header>
-  );
-}
-
-function Sidebar({ active, setActive, open, setOpen, counterfactualComplete }) {
-  return (
-    <aside className={`sidebar ${open ? "sidebar--open" : ""}`}>
+    <aside className={`sidebar planner-sidebar ${open ? "sidebar--open" : ""}`}>
       <div className="brand">
         <div className="brand__mark"><ThermometerSun aria-hidden="true" size={22} /></div>
-        <div><strong>热风险活动诊断</strong><span>Cooling Siting Agent</span></div>
+        <div><strong>高温设施规划 Agent</strong><span>Planner Copilot</span></div>
         <button className="icon-button mobile-only" aria-label="关闭导航" onClick={() => setOpen(false)}>
           <X aria-hidden="true" size={18} />
         </button>
       </div>
       <nav aria-label="主要导航">
         {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
-          <button key={id} className={active === id ? "nav-item nav-item--active" : "nav-item"} onClick={() => { setActive(id); setOpen(false); }}>
+          <button
+            key={id}
+            className={active === id ? "nav-item nav-item--active" : "nav-item"}
+            onClick={() => { setActive(id); setOpen(false); }}
+          >
             <Icon aria-hidden="true" size={18} /><span>{label}</span>
           </button>
         ))}
       </nav>
       <div className="sidebar__foot">
-        <span>研究进度</span>
+        <span>项目状态</span>
         <div className="progress"><span /></div>
-        <strong>{counterfactualComplete ? "7 / 7 核心环节" : "6 / 7 核心环节"}</strong>
-        <small>{counterfactualComplete ? "内部反事实验证已完成" : "下一步：反事实效果测算"}</small>
+        <strong>Demo mock data</strong>
+        <small>面向责任规划师的高温治理工作台</small>
       </div>
     </aside>
   );
 }
 
-function Overview({ data, setActive, selectActivity }) {
-  const activities = data.activities;
-  const counts = Object.keys(STATUS).map((key) => ({
-    key, name: STATUS[key].label, value: activities.filter((item) => item.activity_status === key).length,
-  }));
-  const top = activities.find((item) => item.activity_id === data.featured_activity_id) ?? activities[0];
-  const riskRate = activities.filter((item) => item.activity_status !== "normal").length / activities.length;
-  const counterfactualComplete = Boolean(data.counterfactual_validation?.completed);
+function Header({ active, setMenuOpen }) {
+  const label = NAV_ITEMS.find((item) => item.id === active)?.label ?? "风险诊断";
   return (
-    <section className="view">
-      <div className="overview-header">
-        <div className="overview-header__intro">
-          <span className="eyebrow">城市规划诊断台</span>
-          <h1>识别高温中正在失效的居民活动</h1>
+    <header className="topbar planner-topbar">
+      <button className="icon-button mobile-only" aria-label="打开导航" onClick={() => setMenuOpen(true)}>
+        <Menu aria-hidden="true" size={19} />
+      </button>
+      <div className="topbar__context">
+        <span>海淀区 · 典型高温日</span>
+        <strong>{label}</strong>
+      </div>
+      <div className="topbar__status"><span aria-hidden="true" />Agent 诊断已生成</div>
+    </header>
+  );
+}
+
+function bboxFromFeatureCollection(collection) {
+  const bounds = new maplibregl.LngLatBounds();
+  const visit = (coords) => {
+    if (!Array.isArray(coords)) return;
+    if (typeof coords[0] === "number" && typeof coords[1] === "number") {
+      bounds.extend(coords);
+      return;
+    }
+    coords.forEach(visit);
+  };
+  collection?.features?.forEach((feature) => visit(feature.geometry?.coordinates));
+  return bounds;
+}
+
+function activityPointsToGeoJSON(activities = []) {
+  const features = [];
+  activities.forEach((activity) => {
+    if (Number.isFinite(activity.origin_lon) && Number.isFinite(activity.origin_lat)) {
+      features.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [activity.origin_lon, activity.origin_lat] },
+        properties: {
+          kind: "origin",
+          label: activity.agent_label,
+          name: activity.origin_name,
+          status: activity.activity_status,
+        },
+      });
+    }
+    if (Number.isFinite(activity.destination_lon) && Number.isFinite(activity.destination_lat)) {
+      features.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [activity.destination_lon, activity.destination_lat] },
+        properties: {
+          kind: "destination",
+          label: activity.agent_label,
+          name: activity.destination_name,
+          status: activity.activity_status,
+        },
+      });
+    }
+  });
+  return { type: "FeatureCollection", features };
+}
+
+function segmentsToGeoJSON(segments = []) {
+  return {
+    type: "FeatureCollection",
+    features: segments
+      .filter((segment) => (
+        Number.isFinite(segment.from_lon)
+        && Number.isFinite(segment.from_lat)
+        && Number.isFinite(segment.to_lon)
+        && Number.isFinite(segment.to_lat)
+      ))
+      .map((segment) => ({
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: [[segment.from_lon, segment.from_lat], [segment.to_lon, segment.to_lat]],
+        },
+        properties: {
+          activity_id: segment.activity_id,
+          road_name: segment.road_name ?? "未命名道路",
+          heat_stress: Number(segment.heat_stress ?? 0),
+          segment_heat_exposure: Number(segment.segment_heat_exposure ?? 0),
+        },
+      })),
+  };
+}
+
+function valueOf(properties, key, fallback = 0) {
+  const value = Number(properties?.[key]);
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function normalize(value, min, max) {
+  if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max) || max <= min) return 0;
+  return (value - min) / (max - min);
+}
+
+function enrichFacilitiesWithStrategyScores(collection) {
+  const features = collection?.features ?? [];
+  if (!features.length) {
+    return { type: "FeatureCollection", features: [] };
+  }
+
+  const weights = features.map((feature) => valueOf(feature.properties, "effective_covered_demand_weight"));
+  const snapDistances = features.map((feature) => valueOf(feature.properties, "road_snap_distance_m"));
+  const minWeight = Math.min(...weights);
+  const maxWeight = Math.max(...weights);
+  const minSnap = Math.min(...snapDistances);
+  const maxSnap = Math.max(...snapDistances);
+
+  const scoredFeatures = features.map((feature) => {
+    const p = feature.properties ?? {};
+    const coveredWeight = normalize(valueOf(p, "effective_covered_demand_weight"), minWeight, maxWeight);
+    const roadAccess = 1 - normalize(valueOf(p, "road_snap_distance_m"), minSnap, maxSnap);
+    const publicness = valueOf(p, "publicness_multiplier", 0.75);
+    const readiness = valueOf(p, "operational_readiness", 0.5);
+    const reuse = valueOf(p, "reuse_potential", 0);
+    const demand = valueOf(p, "demand_match", 0);
+    const failureCoverage = valueOf(p, "failure_demand_coverage", 0);
+    const exposureInterruption = valueOf(p, "exposure_interruption", 0);
+    const vulnerable = valueOf(p, "vulnerable_relevance", 0);
+    const scarcity = valueOf(p, "scarcity_improvement", 0);
+
+    return {
+      ...feature,
+      properties: {
+        ...p,
+        score_equity: 0.32 * failureCoverage + 0.24 * demand + 0.2 * vulnerable + 0.14 * scarcity + 0.1 * roadAccess,
+        score_coverage: 0.42 * failureCoverage + 0.3 * coveredWeight + 0.18 * exposureInterruption + 0.1 * demand,
+        score_reuse: 0.42 * reuse + 0.22 * readiness + 0.2 * publicness + 0.1 * demand + 0.06 * roadAccess,
+        score_cost: 0.34 * readiness + 0.26 * roadAccess + 0.18 * publicness + 0.14 * reuse + 0.08 * scarcity,
+      },
+    };
+  });
+
+  ["equity", "coverage", "reuse", "cost"].forEach((strategy) => {
+    const key = `score_${strategy}`;
+    const ranked = [...scoredFeatures].sort((a, b) => valueOf(b.properties, key) - valueOf(a.properties, key));
+    ranked.forEach((feature, index) => {
+      feature.properties[`rank_${strategy}`] = index + 1;
+      feature.properties[`selected_${strategy}`] = index < 12 ? 1 : 0;
+    });
+  });
+
+  return { type: "FeatureCollection", features: scoredFeatures };
+}
+
+function setLayerVisibility(map, layerIds, visible) {
+  layerIds.forEach((id) => {
+    if (map.getLayer(id)) {
+      map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+    }
+  });
+}
+
+function MapLibreHeatMap({ activeLayer, setActiveLayer, strategy }) {
+  const layerLabels = {
+    heat: "热风险",
+    people: "重点人群",
+    facility: "设施缺口",
+    route: "高暴露路径",
+  };
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const popupRef = useRef(null);
+  const [mapState, setMapState] = useState("loading");
+
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return undefined;
+
+    let cancelled = false;
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: {
+        version: 8,
+        sources: {},
+        layers: [
+          {
+            id: "background",
+            type: "background",
+            paint: { "background-color": "#e9f1f2" },
+          },
+        ],
+      },
+      center: [116.3, 39.98],
+      zoom: 10.4,
+      attributionControl: false,
+    });
+
+    mapRef.current = map;
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+
+    fetch("/data/showcase.json")
+      .then((response) => {
+        if (!response.ok) throw new Error(`showcase.json ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const routeSegments = segmentsToGeoJSON(data.segments);
+        const activityPoints = activityPointsToGeoJSON(data.activities);
+        const facilities = enrichFacilitiesWithStrategyScores(
+          data.site_selection?.facility_scenarios_geojson ?? { type: "FeatureCollection", features: [] },
+        );
+
+        const addShowcaseLayers = () => {
+          if (cancelled) return;
+          if (map.getSource("roads")) return;
+
+          map.addSource("osm", {
+            type: "raster",
+            tiles: [
+              "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            ],
+            tileSize: 256,
+            attribution: "© OpenStreetMap contributors",
+          });
+          map.addSource("landuse", { type: "geojson", data: data.local_landuse_basemap });
+          map.addSource("boundary", { type: "geojson", data: data.boundary });
+          map.addSource("roads", { type: "geojson", data: data.roads });
+          map.addSource("routeSegments", { type: "geojson", data: routeSegments });
+          map.addSource("activityPoints", { type: "geojson", data: activityPoints });
+          map.addSource("facilities", { type: "geojson", data: facilities });
+
+          map.addLayer({
+            id: "osm-basemap",
+            type: "raster",
+            source: "osm",
+            paint: {
+              "raster-opacity": 0.64,
+              "raster-saturation": -0.35,
+            },
+          });
+
+          map.addLayer({
+            id: "landuse-fill",
+            type: "fill",
+            source: "landuse",
+            paint: {
+              "fill-color": [
+                "match",
+                ["get", "euluc_label"],
+                "公园绿地", "#9bc7a8",
+                "居住用地", "#dce7ec",
+                "教育用地", "#c9def4",
+                "医疗用地", "#f2c9c0",
+                "商务办公用地", "#e2d5f1",
+                "交通用地", "#e2e6e8",
+                "#eef3f3",
+              ],
+              "fill-opacity": 0.42,
+            },
+          });
+
+          map.addLayer({
+            id: "roads-base",
+            type: "line",
+            source: "roads",
+            paint: {
+              "line-color": "#a8b7b7",
+              "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.45, 13, 1.15, 15, 2],
+              "line-opacity": 0.42,
+            },
+          });
+
+          map.addLayer({
+            id: "roads-heat",
+            type: "line",
+            source: "roads",
+            filter: [">", ["coalesce", ["get", "has_heat_data"], 0], 0],
+            paint: {
+              "line-color": [
+                "interpolate",
+                ["linear"],
+                ["coalesce", ["get", "effective_heat_stress"], 0],
+                0, "#1aa6a6",
+                0.45, "#e2b84c",
+                0.7, "#f46a42",
+                1, "#c94735",
+              ],
+              "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.75, 13, 1.65, 15, 3.2],
+              "line-opacity": 0.92,
+            },
+          });
+
+          map.addLayer({
+            id: "route-segments",
+            type: "line",
+            source: "routeSegments",
+            paint: {
+              "line-color": [
+                "interpolate",
+                ["linear"],
+                ["get", "heat_stress"],
+                0, "#18a999",
+                0.5, "#e2b84c",
+                0.75, "#f46a42",
+                1, "#c94735",
+              ],
+              "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.1, 13, 2.4, 15, 4.2],
+              "line-opacity": 0.86,
+            },
+          });
+
+          map.addLayer({
+            id: "activity-points",
+            type: "circle",
+            source: "activityPoints",
+            paint: {
+              "circle-color": ["case", ["==", ["get", "status"], "failed"], "#f46a42", "#1aa6a6"],
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 2, 13, 4, 15, 6],
+              "circle-stroke-color": "#ffffff",
+              "circle-stroke-width": 1,
+              "circle-opacity": 0.78,
+            },
+          });
+
+          map.addLayer({
+            id: "facility-points",
+            type: "circle",
+            source: "facilities",
+            paint: {
+              "circle-color": "#7e9da4",
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 2.2, 13, 3.8, 15, 5.4],
+              "circle-stroke-color": "#ffffff",
+              "circle-stroke-width": 0.8,
+              "circle-opacity": 0.42,
+            },
+          });
+
+          map.addLayer({
+            id: "facility-selected",
+            type: "circle",
+            source: "facilities",
+            filter: ["==", ["get", `selected_${strategy}`], 1],
+            paint: {
+              "circle-color": strategyColors[strategy] ?? strategyColors.equity,
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 4.6, 13, 7, 15, 10],
+              "circle-stroke-color": "#ffffff",
+              "circle-stroke-width": 2,
+              "circle-opacity": 0.96,
+            },
+          });
+
+          map.addLayer({
+            id: "boundary-line",
+            type: "line",
+            source: "boundary",
+            paint: {
+              "line-color": "#0f2742",
+              "line-width": 2,
+              "line-opacity": 0.7,
+            },
+          });
+
+          map.on("mouseenter", "roads-heat", () => { map.getCanvas().style.cursor = "pointer"; });
+          map.on("mouseleave", "roads-heat", () => { map.getCanvas().style.cursor = ""; });
+          map.on("click", "roads-heat", (event) => {
+            const feature = event.features?.[0];
+            if (!feature) return;
+            popupRef.current?.remove();
+            popupRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: true })
+              .setLngLat(event.lngLat)
+              .setHTML(`<b>${feature.properties.road_name || "道路"}</b><span>有效热压力：${Number(feature.properties.effective_heat_stress ?? 0).toFixed(2)}</span>`)
+              .addTo(map);
+          });
+
+          const bounds = bboxFromFeatureCollection(data.boundary);
+          if (!bounds.isEmpty()) {
+            map.resize();
+            map.fitBounds(bounds, { padding: 28, duration: 0 });
+            window.setTimeout(() => {
+              if (!cancelled) {
+                map.resize();
+                map.fitBounds(bounds, { padding: 28, duration: 0 });
+              }
+            }, 120);
+          }
+          setMapState("ready");
+        };
+
+        if (map.loaded()) {
+          addShowcaseLayers();
+        } else {
+          map.once("load", addShowcaseLayers);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setMapState("error");
+      });
+
+    return () => {
+      cancelled = true;
+      popupRef.current?.remove();
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+    setLayerVisibility(map, ["roads-heat"], activeLayer === "heat" || activeLayer === "route");
+    setLayerVisibility(map, ["route-segments"], activeLayer === "route");
+    setLayerVisibility(map, ["activity-points"], activeLayer === "people" || activeLayer === "route");
+    setLayerVisibility(map, ["facility-points", "facility-selected"], activeLayer === "facility" || activeLayer === "route");
+    setLayerVisibility(map, ["landuse-fill"], activeLayer !== "route");
+    if (map.getLayer("facility-selected")) {
+      map.setFilter("facility-selected", ["==", ["get", `selected_${strategy}`], 1]);
+      map.setPaintProperty("facility-selected", "circle-color", strategyColors[strategy] ?? strategyColors.equity);
+    }
+  }, [activeLayer, mapState, strategy]);
+
+  return (
+    <article className="planner-map-card">
+      <div className="planner-panel-heading">
+        <div>
+          <span>热风险地图工作台</span>
+          <h2>从空间热暴露定位到设施响应单元</h2>
         </div>
-        <p>综合道路热环境、居民活动目的、出行时间与真实路径，定位需要优先获得清凉设施支持的活动与空间。</p>
-      </div>
-      <div className="metric-strip">
-        <Metric label="模拟居民" value={activities.reduce((set, item) => set.add(item.agent_id), new Set()).size} meta="7 类典型居民" />
-        <Metric label="模拟活动" value={activities.length} meta="具备完整活动链" />
-        <Metric label="高温响应活动" value={compactNumber.format(riskRate * 100) + "%"} meta="调整、风险完成或失效" accent="warm" />
-        <Metric label="活动失效" value={counts.find((item) => item.key === "failed").value} meta="达到当前失效阈值" accent="danger" />
-      </div>
-      <div className="overview-grid">
-        <article className="map-stage">
-          <div className="panel-heading">
-            <div><span className="panel-kicker">01 · 空间诊断</span><h2>道路有效热压力</h2></div>
-            <div className="legend"><span className="legend__cool" />低热压力<span className="legend__hot" />高热压力<span className="legend__missing" />缺测道路</div>
-          </div>
-          <MapView data={data} />
-          <div className="map-note"><MapPin aria-hidden="true" size={16} />点击道路查看 LST 与有效热压力</div>
-        </article>
-        <aside className="diagnosis">
-          <div className="panel-heading"><div><span className="panel-kicker">02 · 重点案例</span><h2>典型高暴露活动</h2></div><StatusPill status={top.activity_status} /></div>
-          <div className="case-person"><span>{top.agent_label}</span><strong>{top.trip_purpose}</strong><small>{top.departure_time} 出发 · {compactNumber.format(top.route_distance_m / 1000)} km</small></div>
-          <div className="exposure-total"><span>活动累计热暴露</span><strong>{compactNumber.format(top.cumulative_heat_exposure)}</strong><small>标准化热压力分钟</small></div>
-          <div className="exposure-split">
-            <div><span>沿途道路</span><strong>{compactNumber.format(top.route_cumulative_heat_exposure)}</strong></div>
-            <div><span>目的地停留</span><strong>{compactNumber.format(top.destination_dwell_heat_exposure)}</strong></div>
-          </div>
-          <div className="planning-callout"><span>规划响应</span><p>{top.facility_needs}</p></div>
-          <button className="primary-button" onClick={() => { selectActivity(top.activity_id); setActive("route"); }}>查看完整活动路线<ArrowUpRight aria-hidden="true" size={17} /></button>
-        </aside>
-      </div>
-      <div className="lower-grid">
-        <article className="data-panel">
-          <div className="panel-heading"><div><span className="panel-kicker">03 · 行为结果</span><h2>高温下的活动状态</h2></div></div>
-          <ResponsiveContainer width="100%" height={230}>
-            <BarChart data={counts} layout="vertical" margin={{ left: 4, right: 24 }}>
-              <CartesianGrid stroke="#e8ecea" horizontal={false} />
-              <XAxis type="number" hide />
-              <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} width={70} tick={{ fill: "#64716c", fontSize: 12 }} />
-              <Tooltip cursor={{ fill: "#f1f4f2" }} />
-              <Bar dataKey="value" radius={[0, 3, 3, 0]} barSize={18}>
-                {counts.map((item) => <Cell key={item.key} fill={STATUS[item.key].color} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </article>
-        <article className="workflow">
-          <div className="panel-heading"><div><span className="panel-kicker">04 · 研究链路</span><h2>从识别到干预</h2></div></div>
-          {[
-            ["空间环境底座", "已完成", "done"],
-            ["居民活动与路线模拟", "基础版本已完成", "done"],
-            ["逐道路边累计热暴露", "已完成并审查", "done"],
-            ["高温活动失效识别", "基础版本已完成", "done"],
-            ["动态气象正式接入", "已完成", "done"],
-            ["清凉设施选址", "已形成初步方案", "done"],
-            ["反事实效果验证", counterfactualComplete ? "内部验证已完成" : "下一阶段", counterfactualComplete ? "done" : "active"],
-          ].map(([name, state, type], index) => (
-            <div className={`workflow__row workflow__row--${type}`} key={name}>
-              <span>{String(index + 1).padStart(2, "0")}</span><strong>{name}</strong><small>{state}</small>
-            </div>
+        <div className="planner-layer-tabs">
+          {Object.entries(layerLabels).map(([id, label]) => (
+            <button
+              key={id}
+              className={activeLayer === id ? "planner-layer-tab planner-layer-tab--active" : "planner-layer-tab"}
+              onClick={() => setActiveLayer(id)}
+            >
+              {label}
+            </button>
           ))}
-        </article>
+        </div>
       </div>
-    </section>
+      <div className="real-map-shell">
+        <div ref={mapContainerRef} className="real-map" aria-label="海淀区道路热风险地图" />
+        {mapState === "loading" && <div className="real-map__state">正在加载道路与热暴露数据...</div>}
+        {mapState === "error" && <div className="real-map__state real-map__state--error">地图数据加载失败，请检查 public/data/showcase.json</div>}
+        <div className="map-legend-panel real-map__legend" aria-label="地图图例">
+          <div className="map-legend-group">
+            <strong>选址候选点</strong>
+            <span>
+              <i className="legend-point-current" style={{ "--legend-point-color": strategyColors[strategy] ?? strategyColors.equity }} />
+              {strategyLabels[strategy]}推荐点
+            </span>
+            <span><i className="legend-point-muted" />其他候选点</span>
+          </div>
+          <div className="map-legend-rule" />
+          <div className="map-legend-group map-legend-group--roads">
+            <strong>道路热压力</strong>
+            <span><i className="legend-risk" />高温风险道路</span>
+            <span><i className="legend-cool" />居民活动/清凉设施</span>
+            <span><i className="legend-route" />活动路径分段</span>
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }
 
-function RouteView({ data, selectedId, setSelectedId }) {
-  const [agent, setAgent] = useState("全部居民");
-  const filtered = useMemo(() => agent === "全部居民" ? data.activities : data.activities.filter((item) => item.agent_label === agent), [agent, data.activities]);
-  const activity = filtered.find((item) => item.activity_id === selectedId) ?? filtered[0];
-  const routeSegments = useMemo(() => data.segments.filter((item) => item.activity_id === activity.activity_id).sort((a, b) => a.segment_sequence - b.segment_sequence), [activity, data.segments]);
-  const profile = routeSegments.map((item) => ({ ...item, label: String(item.segment_sequence) }));
-  const topSegments = [...routeSegments].sort((a, b) => (b.segment_heat_exposure ?? 0) - (a.segment_heat_exposure ?? 0)).slice(0, 5);
+function routeEndpointsToGeoJSON(activity) {
+  if (!activity) return { type: "FeatureCollection", features: [] };
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [activity.origin_lon, activity.origin_lat] },
+        properties: { kind: "origin", name: activity.origin_name, label: "活动起点" },
+      },
+      {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [activity.destination_lon, activity.destination_lat] },
+        properties: { kind: "destination", name: activity.destination_name, label: "活动目的地" },
+      },
+    ].filter((feature) => (
+      Number.isFinite(feature.geometry.coordinates[0])
+      && Number.isFinite(feature.geometry.coordinates[1])
+    )),
+  };
+}
+
+function RouteCaseMap({ activityId }) {
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const popupRef = useRef(null);
+  const [mapState, setMapState] = useState("loading");
+
+  useEffect(() => {
+    if (!mapContainerRef.current) return undefined;
+
+    let cancelled = false;
+    setMapState("loading");
+
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: {
+        version: 8,
+        sources: {},
+        layers: [
+          {
+            id: "background",
+            type: "background",
+            paint: { "background-color": "#e9f1f2" },
+          },
+        ],
+      },
+      center: [116.3, 39.98],
+      zoom: 13,
+      attributionControl: false,
+    });
+
+    mapRef.current = map;
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+
+    fetch("/data/showcase.json")
+      .then((response) => {
+        if (!response.ok) throw new Error(`showcase.json ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const activity = data.activities?.find((item) => item.activity_id === activityId);
+        const routeSegments = segmentsToGeoJSON(
+          (data.segments ?? [])
+            .filter((segment) => segment.activity_id === activityId)
+            .sort((a, b) => Number(a.segment_sequence ?? 0) - Number(b.segment_sequence ?? 0)),
+        );
+        const endpoints = routeEndpointsToGeoJSON(activity);
+
+        const addRouteLayers = () => {
+          if (cancelled) return;
+
+          map.addSource("osm", {
+            type: "raster",
+            tiles: [
+              "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            ],
+            tileSize: 256,
+            attribution: "© OpenStreetMap contributors",
+          });
+          map.addSource("routeSegments", { type: "geojson", data: routeSegments });
+          map.addSource("routeEndpoints", { type: "geojson", data: endpoints });
+
+          map.addLayer({
+            id: "osm-basemap",
+            type: "raster",
+            source: "osm",
+            paint: {
+              "raster-opacity": 0.72,
+              "raster-saturation": -0.28,
+            },
+          });
+
+          map.addLayer({
+            id: "route-shadow",
+            type: "line",
+            source: "routeSegments",
+            paint: {
+              "line-color": "#0f2742",
+              "line-width": ["interpolate", ["linear"], ["zoom"], 12, 5.5, 15, 8],
+              "line-opacity": 0.2,
+            },
+          });
+
+          map.addLayer({
+            id: "route-heat-line",
+            type: "line",
+            source: "routeSegments",
+            paint: {
+              "line-color": [
+                "interpolate",
+                ["linear"],
+                ["get", "heat_stress"],
+                0, "#18a999",
+                0.5, "#e2b84c",
+                0.75, "#f46a42",
+                1, "#c94735",
+              ],
+              "line-width": ["interpolate", ["linear"], ["zoom"], 12, 3.4, 15, 6],
+              "line-opacity": 0.96,
+            },
+          });
+
+          map.addLayer({
+            id: "route-endpoints",
+            type: "circle",
+            source: "routeEndpoints",
+            paint: {
+              "circle-color": ["case", ["==", ["get", "kind"], "origin"], "#0f8f8f", "#ef5a3c"],
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 12, 6, 15, 9],
+              "circle-stroke-color": "#ffffff",
+              "circle-stroke-width": 2,
+            },
+          });
+
+          map.on("mouseenter", "route-heat-line", () => { map.getCanvas().style.cursor = "pointer"; });
+          map.on("mouseleave", "route-heat-line", () => { map.getCanvas().style.cursor = ""; });
+          map.on("click", "route-heat-line", (event) => {
+            const feature = event.features?.[0];
+            if (!feature) return;
+            popupRef.current?.remove();
+            popupRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: true })
+              .setLngLat(event.lngLat)
+              .setHTML(`<b>${feature.properties.road_name || "活动路径分段"}</b><span>热压力：${Number(feature.properties.heat_stress ?? 0).toFixed(2)}</span>`)
+              .addTo(map);
+          });
+
+          const bounds = bboxFromFeatureCollection({
+            type: "FeatureCollection",
+            features: [...routeSegments.features, ...endpoints.features],
+          });
+          if (!bounds.isEmpty()) {
+            map.resize();
+            map.fitBounds(bounds, {
+              padding: { top: 70, bottom: 54, left: 54, right: 54 },
+              maxZoom: 15.4,
+              duration: 0,
+            });
+          }
+          setMapState("ready");
+        };
+
+        if (map.loaded()) {
+          addRouteLayers();
+        } else {
+          map.once("load", addRouteLayers);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setMapState("error");
+      });
+
+    return () => {
+      cancelled = true;
+      popupRef.current?.remove();
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [activityId]);
+
   return (
-    <section className="view">
-      <div className="view-heading view-heading--compact">
-        <div><span className="eyebrow">活动级诊断</span><h1>一次日常活动，如何沿道路累积热暴露</h1></div>
-        <p>路线颜色表示每条道路边的暴露贡献。活动必要性、时间刚性与居民脆弱性共同影响行为响应。</p>
+    <article className="planner-map-card route-case-card">
+      <div className="planner-panel-heading">
+        <div>
+          <span>活动路线图</span>
+          <h2>查看单次活动如何沿道路累计热暴露</h2>
+        </div>
       </div>
-      <div className="route-toolbar">
-        <label>居民类型<select value={agent} onChange={(event) => setAgent(event.target.value)}><option>全部居民</option>{[...new Set(data.activities.map((item) => item.agent_label))].map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>活动案例<select value={activity.activity_id} onChange={(event) => setSelectedId(event.target.value)}>{filtered.slice(0, 80).map((item) => <option value={item.activity_id} key={item.activity_id}>{item.trip_purpose} · {item.departure_time} · {STATUS[item.activity_status]?.label}</option>)}</select></label>
-        <StatusPill status={activity.activity_status} />
+      <div className="real-map-shell route-case-map-shell">
+        <div ref={mapContainerRef} className="real-map" aria-label="居民活动路线图" />
+        {mapState === "loading" && <div className="real-map__state">正在加载该活动的道路分段...</div>}
+        {mapState === "error" && <div className="real-map__state real-map__state--error">路线数据加载失败，请检查 activity_id 与 segments</div>}
+        <div className="route-case-legend">
+          <span><i className="origin-dot" />活动起点</span>
+          <span><i className="destination-dot" />活动目的地</span>
+          <span><i className="legend-route" />道路热压力分段</span>
+        </div>
       </div>
-      <div className="route-layout">
-        <article className="route-map">
-          <MapView data={data} routeSegments={routeSegments} selectedActivity={activity} mode="route" />
-          <div className="route-map__legend"><span className="origin-dot" />活动起点<span className="destination-dot" />活动目的地</div>
-        </article>
-        <aside className="route-brief">
-          <span className="panel-kicker">居民活动画像</span>
-          <h2>{activity.agent_label} · {activity.trip_purpose}</h2>
-          <p>{activity.reason}</p>
-          <dl>
-            <div><dt><Clock3 aria-hidden="true" size={15} />出发时间</dt><dd>{activity.departure_time}</dd></div>
-            <div><dt><Footprints aria-hidden="true" size={15} />路线距离</dt><dd>{compactNumber.format(activity.route_distance_m / 1000)} km</dd></div>
-            <div><dt><Route aria-hidden="true" size={15} />路径偏好</dt><dd>{activity.path_preference_label}</dd></div>
-            <div><dt><CircleDot aria-hidden="true" size={15} />主要问题位置</dt><dd>{activity.failure_zone_type}</dd></div>
-          </dl>
-          <div className="planning-callout"><span>需要的清凉支持</span><p>{activity.facility_needs}</p></div>
-        </aside>
+    </article>
+  );
+}
+
+function AgentDiagnosisPanel({ activePlan, setActivePlan, plannerQuestion, setPlannerQuestion, strategy, setStrategy, onGenerate }) {
+  const plan = dynamicPlanProfiles[activePlan];
+
+  return (
+    <aside className="planner-agent-panel">
+      <div className="planner-panel-heading planner-panel-heading--stack">
+        <span>目标驱动选址 Agent</span>
+        <h2>把静态候选点转成动态治理方案</h2>
       </div>
-      <div className="metric-strip metric-strip--route">
-        <Metric label="户外通行" value={`${compactNumber.format(activity.outdoor_travel_minutes)} min`} meta={`${activity.road_edge_count} 条道路边`} />
-        <Metric label="道路暴露" value={compactNumber.format(activity.route_cumulative_heat_exposure)} meta="沿路径累计" accent="warm" />
-        <Metric label="停留暴露" value={compactNumber.format(activity.destination_dwell_heat_exposure)} meta="目的地户外停留" accent="warm" />
-        <Metric label="活动累计暴露" value={compactNumber.format(activity.cumulative_heat_exposure)} meta="标准化热压力分钟" accent="danger" />
-      </div>
-      <div className="lower-grid lower-grid--route">
-        <article className="data-panel">
-          <div className="panel-heading"><div><span className="panel-kicker">暴露剖面</span><h2>道路边贡献与累计过程</h2></div></div>
-          <ResponsiveContainer width="100%" height={280}>
-            <AreaChart data={profile} margin={{ left: -18, right: 12, top: 12 }}>
-              <CartesianGrid stroke="#e8ecea" vertical={false} />
-              <XAxis dataKey="label" axisLine={false} tickLine={false} minTickGap={28} tick={{ fontSize: 11, fill: "#7b8782" }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#7b8782" }} />
-              <Tooltip />
-              <Area type="monotone" dataKey="route_cumulative_exposure_at_segment_end" stroke="#c4473c" fill="#f3d8d4" strokeWidth={2.5} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </article>
-        <article className="hot-segments">
-          <div className="panel-heading"><div><span className="panel-kicker">重点道路</span><h2>暴露贡献最高的道路边</h2></div></div>
-          <div className="segment-list">
-            {topSegments.map((segment, index) => (
-              <div key={`${segment.segment_sequence}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{segment.road_name || "未命名道路"}</strong><small>{compactNumber.format(segment.length_m)} m · 热压力 {compactNumber.format(segment.heat_stress)}</small></div><b>{compactNumber.format(segment.segment_heat_exposure)}</b></div>
+      <section className="agent-goal-box">
+        <label htmlFor="planner-question">规划师输入治理目标</label>
+        <textarea
+          id="planner-question"
+          value={plannerQuestion}
+          onChange={(event) => setPlannerQuestion(event.target.value)}
+          rows={4}
+        />
+        <div className="agent-preset-row">
+          {plannerGoalPresets.map((preset) => (
+            <button
+              key={preset.id}
+              className={activePlan === preset.id ? "agent-preset agent-preset--active" : "agent-preset"}
+              onClick={() => {
+                setActivePlan(preset.id);
+                setPlannerQuestion(preset.prompt);
+              }}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+        <div className="agent-control-grid">
+          <label>
+            选址策略
+            <select value={strategy} onChange={(event) => setStrategy(event.target.value)}>
+              <option value="equity">公平优先</option>
+              <option value="coverage">覆盖优先</option>
+              <option value="reuse">存量复用优先</option>
+              <option value="cost">低成本优先</option>
+            </select>
+          </label>
+          <button className="planner-export-button agent-run-button" onClick={onGenerate}>
+            生成方案
+          </button>
+        </div>
+      </section>
+      <div className="agent-result-scroll">
+        <section className="diagnosis-block">
+          <h3>推荐设施组合</h3>
+          <div className="agent-site-list">
+            {plan.selected.map((site) => (
+              <article key={site.name}>
+                <strong>{site.name}</strong>
+                <span>{site.type}</span>
+                <p>{site.reason}</p>
+              </article>
             ))}
           </div>
-        </article>
+        </section>
+        <section className="diagnosis-block diagnosis-block--risk">
+          <h3>LLM 意图转译</h3>
+          <p>{plan.intent}</p>
+        </section>
+        <section className="diagnosis-block">
+          <h3>动态权重调整</h3>
+          <div className="planner-tags">
+            <span>当前策略：{strategyLabels[strategy]}</span>
+          {plan.weights.map((item) => <span key={item}>{item}</span>)}
+        </div>
+      </section>
+        <section className="diagnosis-block diagnosis-block--advice">
+          <h3>规划建议</h3>
+          <p>{plan.recommendation}</p>
+        </section>
+        <section className="diagnosis-block">
+          <h3>待人工核验</h3>
+          <ul>{plan.risks.map((item) => <li key={item}>{item}</li>)}</ul>
+        </section>
+        <section className="agent-boundary-note">
+          LLM 只负责目标理解、权重转译、方案组织和理由生成；点位、道路热暴露、候选设施和覆盖结果来自 GIS 与规则模型。
+        </section>
       </div>
-    </section>
+    </aside>
   );
 }
 
-function SelectionView({ data }) {
-  const [method, setMethod] = useState("balanced_network");
-  const [size, setSize] = useState(20);
-  const summary = data.site_selection.scenario_summary.find(
-    (item) => item.scenario_method === method && Number(item.scenario_size) === Number(size),
-  );
-  const counterfactual = data.site_selection.counterfactual_summary.find(
-    (item) => item.scenario_method === method && Number(item.scenario_size) === Number(size),
-  );
-  const selected = data.site_selection.facility_scenarios
-    .filter((item) => item.scenario_method === method && Number(item.scenario_size) === Number(size))
-    .sort((a, b) => a.selection_order - b.selection_order);
-  const topFailures = data.site_selection.activity_failure_summary.slice(0, 8);
-  const comparison = data.site_selection.scenario_summary.map((item) => ({
-    ...item,
-    display_label: `${item.scenario_method === "balanced_network" ? "平衡" : "覆盖"} ${item.scenario_size}`,
-  }));
+function PlanComparisonTable() {
   return (
-    <section className="view">
-      <div className="view-heading view-heading--compact">
-        <div><span className="eyebrow">规划干预方案</span><h1>从失效热点生成清凉设施网络</h1></div>
-        <p>将活动失效、道路边累计暴露、设施功能匹配和存量设施复用放入同一选址模型，形成核心设施与路径支撑节点组合。</p>
+    <article className="planner-table-card">
+      <div className="planner-panel-heading">
+        <div>
+          <span>方案对比</span>
+          <h2>不同设施响应对风险缓解的模拟效果</h2>
+        </div>
+        <button className="planner-export-button"><Download size={16} />导出报告</button>
       </div>
-      <div className="selection-toolbar">
-        <label>方案逻辑<select value={method} onChange={(event) => setMethod(event.target.value)}>
-          <option value="balanced_network">核心设施与路径节点平衡</option>
-          <option value="agent_effective_coverage">最大化有效需求覆盖</option>
-        </select></label>
-        <label>设施数量<select value={size} onChange={(event) => setSize(Number(event.target.value))}>
-          {[5, 10, 20].map((item) => <option key={item} value={item}>{item} 个点位</option>)}
-        </select></label>
-        <div className="selection-toolbar__note"><CircleDot aria-hidden="true" size={15} />当前属于模型内部规划方案，容量和开放条件待现场核查</div>
+      <div className="planner-table-wrap">
+        <table className="planner-table">
+          <thead>
+            <tr>
+              <th>方案</th>
+              <th>设施覆盖率</th>
+              <th>热暴露等级</th>
+              <th>平均绕行距离</th>
+              <th>活动恢复</th>
+              <th>规划含义</th>
+            </tr>
+          </thead>
+          <tbody>
+            {comparisonRows.map((row) => (
+              <tr key={row.plan}>
+                <td>{row.plan}</td>
+                <td>{row.coverage}</td>
+                <td><span className={row.exposure.includes("高") ? "risk-text" : "cool-text"}>{row.exposure}</span></td>
+                <td>{row.detour}</td>
+                <td>{row.recovery}</td>
+                <td>{row.note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-      <div className="metric-strip">
-        <Metric label="失效活动需求" value="96" meta="失效、风险完成与行为调整" accent="danger" />
-        <Metric label="路径需求道路边" value="2,408" meta="逐道路边累计暴露汇总" accent="warm" />
-        <Metric label="有效需求覆盖" value={percent.format(summary?.demand_coverage_rate ?? 0)} meta={`${size} 个设施的功能折减覆盖`} accent="cool" />
-        <Metric label="模型失效恢复率" value={percent.format(counterfactual?.failed_activity_recovery_rate ?? 0)} meta="同一活动与高温情景反事实" accent="warm" />
+    </article>
+  );
+}
+
+function FacilityView() {
+  return (
+    <section className="planner-section-card facility-demand-card">
+      <div className="planner-panel-heading">
+        <div><span>设施与活动核验</span><h2>先判断活动需求，再核验哪些设施能承接清凉功能</h2></div>
       </div>
-      <div className="selection-layout">
-        <article className="map-stage">
-          <div className="panel-heading"><div><span className="panel-kicker">失效热点与推荐点</span><h2>{method === "balanced_network" ? "平衡型设施网络" : "最大有效覆盖方案"}</h2></div><div className="legend"><span className="legend__hot" />高需求热点<span className="selection-legend-core" />核心设施<span className="selection-legend-support" />路径节点</div></div>
-          <SelectionMap data={data} method={method} size={size} />
-        </article>
-        <aside className="selection-list">
-          <div className="panel-heading"><div><span className="panel-kicker">优先序列</span><h2>推荐设施行动</h2></div></div>
-          <div className="selection-list__items">
-            {selected.slice(0, 10).map((item) => (
-              <div key={`${item.scenario_method}-${item.scenario_size}-${item.selection_order}`}>
-                <span>{String(item.selection_order).padStart(2, "0")}</span>
-                <div><strong>{item.poi_name}</strong><small>{item.recommended_functions || item.function_categories} · 新增覆盖 {compactNumber.format(item.marginal_covered_demand_weight)}</small></div>
-                <b>{item.candidate_role === "core" ? "核心" : "路径"}</b>
+
+      <div className="activity-scenario-list activity-scenario-list--compact">
+        {activityCases.map((item) => (
+          <article key={item.person}>
+            <div className="activity-scenario__role">
+              <Users size={18} />
+              <div>
+                <h3>{item.person}</h3>
+                <span>{item.time}</span>
               </div>
-            ))}
-          </div>
-        </aside>
+            </div>
+            <div className="activity-scenario__body">
+              <p><b>活动链</b>{item.activity}</p>
+              <p><b>行为约束</b>{item.constraint}</p>
+              <p><b>模拟判断</b>{item.behavior}</p>
+            </div>
+            <strong>{item.planning}</strong>
+          </article>
+        ))}
       </div>
-      <div className="lower-grid">
-        <article className="data-panel">
-          <div className="panel-heading"><div><span className="panel-kicker">方案比较</span><h2>设施数量与有效覆盖</h2></div></div>
-          <ResponsiveContainer width="100%" height={270}>
-            <BarChart data={comparison} margin={{ left: -12, right: 20, top: 12 }}>
-              <CartesianGrid stroke="#e8ecea" vertical={false} />
-              <XAxis dataKey="display_label" axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
-              <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `${Math.round(value * 100)}%`} />
-              <Tooltip formatter={(value) => percent.format(value)} />
-              <Bar dataKey="demand_coverage_rate" fill="#2d7885" radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </article>
-        <article className="hot-segments">
-          <div className="panel-heading"><div><span className="panel-kicker">失效构成</span><h2>优先处理的活动问题</h2></div></div>
-          <div className="segment-list">
-            {topFailures.map((item, index) => (
-              <div key={`${item.failure_zone_type}-${item.activity_status}-${item.trip_purpose}`}>
+
+      <div className="section-divider-label">可承接设施核验</div>
+
+      <div className="facility-audit-layout">
+        {facilityChecks.map((item) => (
+          <article key={item.name}>
+            <CheckCircle2 size={18} />
+            <div>
+              <h3>{item.name}</h3>
+              <strong>{item.status}</strong>
+            </div>
+            <dl>
+              <div><dt>可承接功能</dt><dd>{item.service}</dd></div>
+              <div><dt>空间依据</dt><dd>{item.evidence}</dd></div>
+              <div><dt>人工核验</dt><dd>{item.check}</dd></div>
+            </dl>
+          </article>
+        ))}
+      </div>
+      <div className="facility-verification-strip">
+        {["公共属性", "开放时间", "室内容量", "步行可达", "改造成本", "运维主体"].map((item) => (
+          <span key={item}>{item}</span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ActivityRouteView() {
+  const [selectedRoute, setSelectedRoute] = useState(routeCases[1].id);
+  const route = routeCases.find((item) => item.id === selectedRoute) ?? routeCases[0];
+
+  return (
+    <>
+      <section className="planner-route-toolbar">
+        <label>
+          活动路线案例
+          <select value={selectedRoute} onChange={(event) => setSelectedRoute(event.target.value)}>
+            {routeCases.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+          </select>
+        </label>
+        <div className="route-summary-strip">
+          <span>{route.origin}</span>
+          <Route size={18} />
+          <span>{route.destination}</span>
+        </div>
+        <strong>{route.time} · {route.distance}</strong>
+      </section>
+
+      <section className="planner-main-grid planner-main-grid--route">
+        <RouteCaseMap activityId={route.id} />
+        <aside className="route-inspector planner-section-card">
+          <div className="planner-panel-heading planner-panel-heading--stack">
+            <span>活动路线诊断</span>
+            <h2>{route.label}</h2>
+          </div>
+          <div className="route-inspector__score">
+            <span>路径累计热暴露</span>
+            <strong>{route.exposure}</strong>
+            <small>{route.failed}</small>
+          </div>
+          <div className="route-inspector__timeline">
+            {["出发点语义核验", "路网可达路径生成", "逐道路边热暴露累计", "活动失效原因判断", "清凉设施响应建议"].map((item, index) => (
+              <div key={item}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <div><strong>{item.trip_purpose} · {item.failure_zone_type}</strong><small>{STATUS[item.activity_status]?.label} · {item.activity_count} 项活动</small></div>
-                <b>{compactNumber.format(item.total_demand_weight)}</b>
+                <p>{item}</p>
+              </div>
+            ))}
+          </div>
+          <section className="diagnosis-block diagnosis-block--advice">
+            <h3>Agent 路线解释</h3>
+            <p>{route.adjustment}</p>
+          </section>
+        </aside>
+      </section>
+    </>
+  );
+}
+
+function CounterfactualView() {
+  return (
+    <>
+      <section className="counterfactual-board">
+        <div className="planner-panel-heading">
+          <div><span>反事实方案</span><h2>比较“如果这样干预”，活动失效会不会减少</h2></div>
+        </div>
+        <div className="counterfactual-card-grid">
+          {counterfactualCards.map((item, index) => (
+            <article key={item.name} className={index === 0 ? "counterfactual-card counterfactual-card--base" : "counterfactual-card"}>
+              <span>{item.name}</span>
+              <div>
+                <strong>{item.coverage}</strong>
+                <small>设施覆盖率</small>
+              </div>
+              <p><b>{item.exposure}</b>热暴露等级 · {item.change}</p>
+              <em>{item.note}</em>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="counterfactual-logic-grid">
+        <article className="planner-section-card">
+          <div className="planner-panel-heading">
+            <div><span>推演逻辑</span><h2>只改变设施干预条件，保持居民活动需求不变</h2></div>
+          </div>
+          <div className="scenario-step-list">
+            {[
+              ["基线", "保留现状道路热暴露、居民活动链和已有设施开放条件"],
+              ["干预", "分别加入遮阴、饮水、休憩点和路径优化方案"],
+              ["重算", "重新计算设施可达、绕行距离、路径热暴露和活动恢复"],
+              ["审议", "输出收益、成本、待核验事项和可能副作用"],
+            ].map(([title, text]) => (
+              <div key={title}>
+                <strong>{title}</strong>
+                <p>{text}</p>
               </div>
             ))}
           </div>
         </article>
+        <article className="planner-section-card">
+          <div className="planner-panel-heading">
+            <div><span>Agent 输出</span><h2>把模型结果组织成可讨论的治理选项</h2></div>
+          </div>
+          <div className="scenario-agent-note">
+            <AlertTriangle size={20} />
+            <p>优先推荐“存量复用组合”作为首轮试点，原因是覆盖提升明显、实施成本较低，同时可以通过党群服务中心和卫生服务站快速形成可管理的清凉服务网络。</p>
+          </div>
+        </article>
+      </section>
+      <PlanComparisonTable />
+    </>
+  );
+}
+
+function ExportView() {
+  return (
+    <section className="planner-section-card">
+      <div className="planner-panel-heading">
+        <div><span>报告导出</span><h2>面向会议汇报与方案审议的一页式材料</h2></div>
+      </div>
+      <div className="export-card">
+        <FileText size={28} />
+        <div>
+          <h3>高温设施规划 Agent 诊断报告</h3>
+          <p>包含风险地图、影响人群、设施缺口、方案对比、待核验事项与实施建议。</p>
+        </div>
+        <button className="planner-export-button"><Download size={16} />生成 PDF</button>
       </div>
     </section>
   );
 }
 
-function EvidenceView({ data }) {
-  const hot = data.hot_days[0];
-  const counterfactual = data.counterfactual_validation;
-  const roadAudit = data.road_network_audit;
-  const roadMain = roadAudit.routing_main_network;
-  const routeAudit = roadAudit.activity_route_audit;
-  const checks = Object.entries(data.audit.failed_conservation_checks).map(([name, value]) => ({ name: name.replaceAll("_", " "), value }));
+function PlannerDashboard({ active }) {
+  const [activeLayer, setActiveLayer] = useState("heat");
+  const [activePlan, setActivePlan] = useState("elder-school");
+  const [plannerQuestion, setPlannerQuestion] = useState(plannerGoalPresets[0].prompt);
+  const [strategy, setStrategy] = useState("equity");
+  const pageTitle = useMemo(() => {
+    if (active === "facility") return "设施与活动核验";
+    if (active === "route") return "活动路线";
+    if (active === "scenario") return "反事实方案";
+    if (active === "export") return "报告导出";
+    return "高温设施规划 Agent";
+  }, [active]);
+  const handleGeneratePlan = () => {
+    const preset = plannerGoalPresets.find((item) => item.id === activePlan);
+    setActiveLayer(preset?.layer ?? "facility");
+  };
+
   return (
-    <section className="view">
-      <div className="view-heading view-heading--compact">
-        <div><span className="eyebrow">证据与边界</span><h1>哪些结果已经通过检查，哪些仍需外部验证</h1></div>
-        <p>把内部一致性、气象数据核验和待校准参数分开表达，避免将阶段性模型结果误读为最终规划结论。</p>
-      </div>
-      <div className="evidence-hero">
-        <div><span>首位典型高温日</span><strong>{hot.date_beijing}</strong><small>依据日间平均气温、最高气温、高温小时与太阳辐射综合排序</small></div>
-        <Metric label="10:00–16:00 平均气温" value={`${compactNumber.format(hot.daytime_t2m_mean_c)}°C`} meta="ERA5-Land" accent="warm" />
-        <Metric label="日间最高气温" value={`${compactNumber.format(hot.daytime_t2m_max_c)}°C`} meta={`${hot.hot_hour_count} 个 ≥35°C 小时`} accent="danger" />
-      </div>
-      <div className="evidence-grid">
-        <article className="data-panel">
-          <div className="panel-heading"><div><span className="panel-kicker">气象背景</span><h2>2024 年夏季日间气温</h2></div></div>
-          <ResponsiveContainer width="100%" height={330}>
-            <LineChart data={data.weather} margin={{ left: -18, right: 12, top: 12 }}>
-              <CartesianGrid stroke="#e8ecea" vertical={false} />
-              <XAxis dataKey="date_beijing" axisLine={false} tickLine={false} minTickGap={42} tick={{ fontSize: 11, fill: "#7b8782" }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#7b8782" }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="daytime_t2m_mean_c" name="日间平均气温" stroke="#e07439" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="daytime_t2m_max_c" name="日间最高气温" stroke="#c4473c" dot={false} strokeWidth={1.5} />
-            </LineChart>
-          </ResponsiveContainer>
-        </article>
-        <article className="audit-panel">
-          <div className="panel-heading"><div><span className="panel-kicker">内部一致性</span><h2>逐道路边计算审查</h2></div><CheckCircle2 aria-hidden="true" size={22} /></div>
-          <div className="audit-main"><strong>0</strong><span>项守恒或连续性错误</span></div>
-          <div className="audit-stats"><div><span>审查活动</span><b>{data.audit.activities}</b></div><div><span>审查道路边</span><b>{data.audit.segments.toLocaleString("zh-CN")}</b></div><div><span>环境覆盖率</span><b>{percent.format(data.audit.mean_route_environment_coverage)}</b></div></div>
-          <div className="check-list">{checks.map((check) => <div key={check.name}><CheckCircle2 aria-hidden="true" size={15} /><span>{check.name}</span><b>{check.value}</b></div>)}</div>
-        </article>
-      </div>
-      <article className="counterfactual-panel">
-        <div className="panel-heading">
-          <div><span className="panel-kicker">干预效果证据</span><h2>内部反事实验证</h2></div>
-          <StatusPill label="模型内部验证已完成" color="#26856b" />
+    <main id="main-content" className="planner-workspace">
+      <section className="planner-hero">
+        <div>
+          <span className="eyebrow">Responsible Planner Agent</span>
+          <h1>{pageTitle}</h1>
+          <p>从“哪里热”到“影响了谁、阻碍了什么活动、设施如何响应”</p>
         </div>
-        <div className="counterfactual-panel__metrics">
-          <Metric label="干预情景" value={counterfactual.scenario_count} meta="设施数量与目标函数组合" accent="cool" />
-          <Metric label="活动对比" value={counterfactual.activity_comparisons.toLocaleString("zh-CN")} meta={`${counterfactual.baseline_activities} 项基准活动的情景复算`} accent="warm" />
-          <Metric label="最佳失效恢复率" value={percent.format(counterfactual.best_failed_activity_recovery_rate)} meta="失效活动在设施干预后恢复" accent="warm" />
-          <Metric label="最大暴露削减" value={compactNumber.format(counterfactual.best_total_exposure_reduction)} meta="模型标准化热压力分钟" accent="danger" />
+        <div className="planner-hero__note">
+          <ShieldCheck size={20} />
+          <span>GIS核验空间事实，受约束LLM组织居民活动情境、解释问题并生成可审议证据。</span>
         </div>
-        <div className="counterfactual-panel__scope">
-          <div><CheckCircle2 aria-hidden="true" size={17} /><p><strong>已回答：</strong>{counterfactual.validation_scope}，用于比较方案方向与设施组合。</p></div>
-          <div><ShieldCheck aria-hidden="true" size={17} /><p><strong>仍待回答：</strong>居民真实行为响应、设施使用率与实施后的现场降温效果，需要问卷、轨迹或实测数据校准。</p></div>
-        </div>
-      </article>
-      <article className="counterfactual-panel">
-        <div className="panel-heading">
-          <div><span className="panel-kicker">空间执行证据</span><h2>OSM 步行主网络质量审查</h2></div>
-          <StatusPill label="正式路径网络已接入" color="#26856b" />
-        </div>
-        <div className="counterfactual-panel__metrics">
-          <Metric label="主网络道路边" value={roadMain.edges.toLocaleString("zh-CN")} meta="逐道路边路径计算单元" accent="cool" />
-          <Metric label="连通分量" value={roadMain.components} meta="最大连通主网络" accent="cool" />
-          <Metric label="活动路径可达率" value={percent.format(routeAudit.route_reachability_rate)} meta={`${routeAudit.activity_count} 项活动 OD 审查`} accent="warm" />
-          <Metric label="绕行系数中位数" value={compactNumber.format(routeAudit.median_detour_ratio)} meta="道路路径距离 / 直线距离" accent="warm" />
-        </div>
-        <div className="counterfactual-panel__scope">
-          <div><CheckCircle2 aria-hidden="true" size={17} /><p><strong>已完成：</strong>排除 {roadAudit.excluded_major_road_edges.toLocaleString("zh-CN")} 条高等级非步行道路，主网络保持单一连通分量并通过现有 RoadRouter 接口审查。</p></div>
-          <div><ShieldCheck aria-hidden="true" size={17} /><p><strong>持续核验：</strong>全部候选 OD 中 {percent.format(roadAudit.od_access_audit.within_100m_rate)} 可在 100 米内接入主网络，较远点位仍需核验社区入口与内部通道。</p></div>
-        </div>
-      </article>
-      <div className="boundary-grid">
-        <article><span className="boundary-grid__state boundary-grid__state--done">已经完成</span><h3>可以稳定展示的结果</h3><p>空间环境底座、活动与路径模拟基础版本、逐道路边累计暴露、活动状态判断、计算守恒与路径连续性审查。</p></article>
-        <article><span className="boundary-grid__state boundary-grid__state--done">已经完成</span><h3>动态气象与内部反事实验证</h3><p>ERA5-Land 已接入活动暴露计算；清凉设施方案已在同一批活动和高温情景下完成干预前后比较。</p></article>
-        <article><span className="boundary-grid__state">仍需外部验证</span><h3>规划决策可信度</h3><p>活动失效阈值、居民行为参数、目的地真实微环境、设施使用率与选址后的活动恢复效果。</p></article>
-      </div>
-    </section>
+      </section>
+
+      <section className="planner-metric-grid">
+        {metricCards.map((item) => <MetricCard key={item.label} item={item} />)}
+      </section>
+
+      {active === "facility" && <FacilityView />}
+      {active === "route" && <ActivityRouteView />}
+      {active === "scenario" && <CounterfactualView />}
+      {active === "export" && <ExportView />}
+
+      {active === "risk" && (
+        <>
+          <section className="planner-main-grid">
+            <MapLibreHeatMap activeLayer={activeLayer} setActiveLayer={setActiveLayer} strategy={strategy} />
+            <AgentDiagnosisPanel
+              activePlan={activePlan}
+              setActivePlan={setActivePlan}
+              plannerQuestion={plannerQuestion}
+              setPlannerQuestion={setPlannerQuestion}
+              strategy={strategy}
+              setStrategy={(nextStrategy) => {
+                setStrategy(nextStrategy);
+                setActiveLayer("facility");
+              }}
+              onGenerate={handleGeneratePlan}
+            />
+          </section>
+          <PlanComparisonTable />
+        </>
+      )}
+    </main>
   );
 }
 
 function App() {
-  const [data, setData] = useState(null);
-  const [active, setActive] = useState("overview");
-  const [selectedId, setSelectedId] = useState("");
+  const [active, setActive] = useState("risk");
   const [menuOpen, setMenuOpen] = useState(false);
-  useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}data/showcase.json`).then((response) => response.json()).then((payload) => {
-      setData(payload);
-      setSelectedId(payload.featured_activity_id ?? payload.activities[0]?.activity_id ?? "");
-    });
-  }, []);
-  if (!data) return <div className="loading" aria-live="polite"><ThermometerSun aria-hidden="true" /><span>正在载入研究成果…</span></div>;
+
   return (
-    <div className="app-shell">
-      <Sidebar active={active} setActive={setActive} open={menuOpen} setOpen={setMenuOpen} counterfactualComplete={Boolean(data.counterfactual_validation?.completed)} />
+    <div className="app-shell planner-shell">
+      <Sidebar active={active} setActive={setActive} open={menuOpen} setOpen={setMenuOpen} />
       <div className="app-main">
-        <Header active={active} setActive={setActive} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-        <main id="main-content">
-          {active === "overview" && <Overview data={data} setActive={setActive} selectActivity={setSelectedId} />}
-          {active === "route" && <RouteView data={data} selectedId={selectedId} setSelectedId={setSelectedId} />}
-          {active === "selection" && <SelectionView data={data} />}
-          {active === "evidence" && <EvidenceView data={data} />}
-        </main>
+        <Header active={active} setMenuOpen={setMenuOpen} />
+        <PlannerDashboard active={active} />
       </div>
     </div>
   );
