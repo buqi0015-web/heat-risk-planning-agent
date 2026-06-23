@@ -205,6 +205,8 @@ const strategyColors = {
   cost: "#f4a340",
 };
 
+const showcaseDataUrl = `${import.meta.env.BASE_URL}data/showcase.json`;
+
 function MetricCard({ item }) {
   return (
     <article className={`planner-metric planner-metric--${item.tone}`}>
@@ -438,7 +440,7 @@ function MapLibreHeatMap({ activeLayer, setActiveLayer, strategy }) {
     mapRef.current = map;
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
 
-    fetch("/data/showcase.json")
+    fetch(showcaseDataUrl)
       .then((response) => {
         if (!response.ok) throw new Error(`showcase.json ${response.status}`);
         return response.json();
@@ -761,7 +763,7 @@ function RouteCaseMap({ activityId }) {
     mapRef.current = map;
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
 
-    fetch("/data/showcase.json")
+    fetch(showcaseDataUrl)
       .then((response) => {
         if (!response.ok) throw new Error(`showcase.json ${response.status}`);
         return response.json();
