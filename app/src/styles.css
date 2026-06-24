@@ -570,6 +570,71 @@ body { background: var(--planner-bg); }
 .agent-site-list strong { color: var(--planner-navy); font-size: 13px; }
 .agent-site-list span { margin: 5px 0; color: var(--planner-teal-dark); font-size: 12px; font-weight: 800; }
 .agent-site-list p { margin: 0; color: var(--planner-muted); font-size: 11px; line-height: 1.55; }
+.agent-decomposition-block { background: #f8fcfc; }
+.agent-decomposition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.agent-decomposition-grid div {
+  min-height: 70px;
+  padding: 10px;
+  border: 1px solid #d7e7eb;
+  background: #ffffff;
+  border-radius: 8px;
+}
+.agent-decomposition-grid span,
+.agent-decomposition-grid strong {
+  display: block;
+}
+.agent-decomposition-grid span {
+  color: var(--planner-muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+.agent-decomposition-grid strong {
+  margin-top: 6px;
+  color: var(--planner-navy);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.agent-strategy-reason {
+  margin-bottom: 10px !important;
+}
+.agent-followup-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.agent-followup {
+  border: 1px solid var(--planner-border);
+  background: #ffffff;
+  color: var(--planner-muted);
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.agent-followup--active {
+  border-color: var(--planner-teal);
+  background: var(--planner-cool-soft);
+  color: var(--planner-teal-dark);
+  font-weight: 800;
+}
+.agent-followup-answer {
+  margin-top: 10px;
+  padding: 11px;
+  border-left: 4px solid var(--planner-teal);
+  background: #f4fbfb;
+}
+.agent-followup-answer strong {
+  display: block;
+  color: var(--planner-navy);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.agent-followup-answer p {
+  margin: 0;
+  color: var(--planner-muted);
+  font-size: 12px;
+  line-height: 1.68;
+}
 .agent-boundary-note { margin-top: auto; padding: 11px 16px; color: #6a7a80; background: #f4f8f9; border-top: 1px solid var(--planner-border); font-size: 11px; line-height: 1.65; }
 .agent-result-scroll { min-height: 0; flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #9db1b7 #eef5f6; }
 .agent-result-scroll::-webkit-scrollbar { width: 8px; }

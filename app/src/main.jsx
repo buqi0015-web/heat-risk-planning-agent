@@ -154,7 +154,16 @@ const plannerGoalPresets = [
 
 const dynamicPlanProfiles = {
   "elder-school": {
+    strategy: "equity",
     intent: "识别出重点对象为慢病老人和接送学家庭，约束被转译为低绕行、近医疗与近学校、可停留、遮阴优先。",
+    judgement: "这个目标的核心不是增加最多设施，而是优先保障时间刚性和热脆弱性更高的活动，尤其是就医、取药和校门等待。",
+    decomposition: {
+      groups: ["慢病老人", "接送学家庭"],
+      activities: ["就医取药", "校门等待", "短距离步行"],
+      constraints: ["低绕行", "近学校", "近医疗点", "可短暂停留"],
+      facilities: ["遮阴", "座椅", "饮水", "室内休憩"],
+      strategyReason: "公平优先能够把有限设施先投向活动刚性强、热脆弱性高、绕行容忍低的人群。",
+    },
     weights: ["重点人群覆盖 +35%", "时间刚性 +25%", "绕行距离 +20%", "存量复用 +20%"],
     recommendation:
       "优先在学院路-中关村南部、学校周边等候空间、社区卫生服务站周边布置遮阴与短暂停留设施，形成可到达、可等待、可陪护的清凉节点。",
@@ -164,9 +173,23 @@ const dynamicPlanProfiles = {
       { name: "党群服务中心复合点", type: "清凉驿站", reason: "具备公共服务属性，适合承接室内避暑和应急照护。" },
     ],
     risks: ["需核验学校周边可布置空间", "卫生服务站开放时间需确认", "党群服务中心容量需现场复核"],
+    followUps: [
+      { question: "为什么不优先选公园？", answer: "公园能降低环境热风险，但老人就医和接送学家庭的时间、目的地更固定。优先点应贴近医院、学校和可进入公共服务设施，公园更适合作为补充恢复空间。" },
+      { question: "预算有限先做哪 3 个点？", answer: "先做学校周边等候点、社区卫生服务站联动点、党群服务中心复合点。三类点分别覆盖等待、就医和室内避暑，便于形成首轮可核验试点。" },
+      { question: "哪些内容必须人工核验？", answer: "需要核验学校周边可布置空间、卫生服务站午后开放时段、党群服务中心室内容量和管理排班。" },
+    ],
   },
   "outdoor-workers": {
+    strategy: "coverage",
     intent: "识别出重点对象为户外劳动者，约束被转译为沿路连续覆盖、补水便利、短暂停留和路径暴露中断。",
+    judgement: "这个目标的核心是打断连续道路边热暴露。设施不应只放在目的地，而要沿配送、巡查和保洁路径形成短停网络。",
+    decomposition: {
+      groups: ["户外劳动者"],
+      activities: ["配送", "巡查", "保洁", "午间通勤"],
+      constraints: ["沿路连续覆盖", "高暴露路径中断", "快速补水", "短暂停留"],
+      facilities: ["饮水点", "遮阴候停", "短时休息点"],
+      strategyReason: "覆盖优先更适合沿道路分段降低连续暴露，使多个任务路径都能获得基本支持。",
+    },
     weights: ["高暴露路径中断 +40%", "饮水可达 +25%", "连续覆盖 +20%", "实施成本 +15%"],
     recommendation:
       "优先沿高暴露道路和配送巡查密集路径布置饮水点、遮阴候停点和短时休息点，降低连续道路边热暴露。",
@@ -176,9 +199,23 @@ const dynamicPlanProfiles = {
       { name: "公园入口服务点", type: "短暂停留", reason: "靠近绿色空间，可作为补水和恢复节点。" },
     ],
     risks: ["路侧设施需核验市政权属", "饮水点运维主体需明确", "夜间开放能力暂未纳入"],
+    followUps: [
+      { question: "为什么不只做室内驿站？", answer: "户外劳动者的风险主要来自连续路径暴露，室内驿站能恢复体力，但无法覆盖每一段高热道路。沿路饮水和短停点能更直接打断暴露。" },
+      { question: "预算有限先做哪 3 个点？", answer: "先做高暴露道路交汇点、公交站复合候停点和公园入口服务点，分别覆盖路径中断、公共候停和短时恢复。" },
+      { question: "哪些内容必须人工核验？", answer: "需要核验路侧空间权属、饮水点运维责任、夜间可用性和是否影响道路通行安全。" },
+    ],
   },
   "reuse-first": {
+    strategy: "reuse",
     intent: "识别出治理目标为低成本存量复用，约束被转译为公共性、开放时间、容量、道路可达和功能嵌入潜力。",
+    judgement: "这个目标的核心是把已有公共服务节点转成清凉服务网络，先做可快速开放、可管理、可复核的低成本试点。",
+    decomposition: {
+      groups: ["慢病老人", "户外劳动者", "午间通勤人群"],
+      activities: ["就医取药", "短时休憩", "补水", "高温预警接收"],
+      constraints: ["公共性", "可开放", "有容量", "靠近日常路径"],
+      facilities: ["党群服务中心", "公共文化空间", "卫生服务站", "公交站点"],
+      strategyReason: "存量复用优先能降低实施成本，并让设施具备明确管理主体和持续运营条件。",
+    },
     weights: ["存量复用潜力 +35%", "公共性 +25%", "设施容量 +20%", "需求覆盖 +20%"],
     recommendation:
       "优先从党群服务中心、公共文化空间、卫生服务站和交通节点中筛选可快速嵌入清凉功能的点位，形成首批低成本改造清单。",
@@ -188,6 +225,11 @@ const dynamicPlanProfiles = {
       { name: "公交站点", type: "遮阴 + 饮水", reason: "靠近日常路径，适合补齐路侧短板。" },
     ],
     risks: ["需要现场核验空调与座椅", "开放时段可能与高温时段错位", "管理主体需街道协调"],
+    followUps: [
+      { question: "为什么优先复用党群服务中心？", answer: "党群服务中心具有公共服务属性和管理主体，适合承接室内清凉、信息发布和应急照护，落地阻力通常低于新建设施。" },
+      { question: "预算有限先做哪 3 个点？", answer: "先做党群服务中心、公共文化空间和卫生服务站。它们具备室内空间或健康服务联动条件，适合作为首批清凉服务锚点。" },
+      { question: "哪些内容必须人工核验？", answer: "需要核验空调、座椅、开放时段、可进入性、容量上限和管理主体是否愿意承担高温期间服务。" },
+    ],
   },
 };
 
@@ -206,6 +248,12 @@ const strategyColors = {
 };
 
 const showcaseDataUrl = `${import.meta.env.BASE_URL}data/showcase.json`;
+
+function inferPlanFromQuestion(question) {
+  if (/配送|巡查|保洁|户外|劳动|饮水|补水|沿途/.test(question)) return "outdoor-workers";
+  if (/复用|党群|卫生服务|公共文化|低成本|存量/.test(question)) return "reuse-first";
+  return "elder-school";
+}
 
 function MetricCard({ item }) {
   return (
@@ -913,8 +961,19 @@ function RouteCaseMap({ activityId }) {
   );
 }
 
-function AgentDiagnosisPanel({ activePlan, setActivePlan, plannerQuestion, setPlannerQuestion, strategy, setStrategy, onGenerate }) {
+function AgentDiagnosisPanel({
+  activePlan,
+  setActivePlan,
+  plannerQuestion,
+  setPlannerQuestion,
+  strategy,
+  setStrategy,
+  selectedFollowUp,
+  setSelectedFollowUp,
+  onGenerate,
+}) {
   const plan = dynamicPlanProfiles[activePlan];
+  const activeFollowUp = plan.followUps.find((item) => item.question === selectedFollowUp) ?? plan.followUps[0];
 
   return (
     <aside className="planner-agent-panel">
@@ -938,6 +997,7 @@ function AgentDiagnosisPanel({ activePlan, setActivePlan, plannerQuestion, setPl
               onClick={() => {
                 setActivePlan(preset.id);
                 setPlannerQuestion(preset.prompt);
+                setSelectedFollowUp(dynamicPlanProfiles[preset.id].followUps[0].question);
               }}
             >
               {preset.label}
@@ -960,6 +1020,19 @@ function AgentDiagnosisPanel({ activePlan, setActivePlan, plannerQuestion, setPl
         </div>
       </section>
       <div className="agent-result-scroll">
+        <section className="diagnosis-block agent-decomposition-block">
+          <h3>Agent 目标拆解</h3>
+          <div className="agent-decomposition-grid">
+            <div><span>重点人群</span><strong>{plan.decomposition.groups.join("、")}</strong></div>
+            <div><span>活动情境</span><strong>{plan.decomposition.activities.join("、")}</strong></div>
+            <div><span>空间约束</span><strong>{plan.decomposition.constraints.join("、")}</strong></div>
+            <div><span>设施偏好</span><strong>{plan.decomposition.facilities.join("、")}</strong></div>
+          </div>
+        </section>
+        <section className="diagnosis-block diagnosis-block--risk">
+          <h3>Agent 判断</h3>
+          <p>{plan.judgement}</p>
+        </section>
         <section className="diagnosis-block">
           <h3>推荐设施组合</h3>
           <div className="agent-site-list">
@@ -972,20 +1045,35 @@ function AgentDiagnosisPanel({ activePlan, setActivePlan, plannerQuestion, setPl
             ))}
           </div>
         </section>
-        <section className="diagnosis-block diagnosis-block--risk">
-          <h3>LLM 意图转译</h3>
-          <p>{plan.intent}</p>
-        </section>
         <section className="diagnosis-block">
-          <h3>动态权重调整</h3>
+          <h3>策略转译</h3>
+          <p className="agent-strategy-reason">{plan.decomposition.strategyReason}</p>
           <div className="planner-tags">
             <span>当前策略：{strategyLabels[strategy]}</span>
-          {plan.weights.map((item) => <span key={item}>{item}</span>)}
-        </div>
-      </section>
+            {plan.weights.map((item) => <span key={item}>{item}</span>)}
+          </div>
+        </section>
         <section className="diagnosis-block diagnosis-block--advice">
           <h3>规划建议</h3>
           <p>{plan.recommendation}</p>
+        </section>
+        <section className="diagnosis-block agent-followup-block">
+          <h3>可追问问题</h3>
+          <div className="agent-followup-row">
+            {plan.followUps.map((item) => (
+              <button
+                key={item.question}
+                className={activeFollowUp.question === item.question ? "agent-followup agent-followup--active" : "agent-followup"}
+                onClick={() => setSelectedFollowUp(item.question)}
+              >
+                {item.question}
+              </button>
+            ))}
+          </div>
+          <div className="agent-followup-answer">
+            <strong>{activeFollowUp.question}</strong>
+            <p>{activeFollowUp.answer}</p>
+          </div>
         </section>
         <section className="diagnosis-block">
           <h3>待人工核验</h3>
@@ -1222,6 +1310,7 @@ function PlannerDashboard({ active }) {
   const [activePlan, setActivePlan] = useState("elder-school");
   const [plannerQuestion, setPlannerQuestion] = useState(plannerGoalPresets[0].prompt);
   const [strategy, setStrategy] = useState("equity");
+  const [selectedFollowUp, setSelectedFollowUp] = useState(dynamicPlanProfiles["elder-school"].followUps[0].question);
   const pageTitle = useMemo(() => {
     if (active === "facility") return "设施与活动核验";
     if (active === "route") return "活动路线";
@@ -1230,7 +1319,12 @@ function PlannerDashboard({ active }) {
     return "高温设施规划 Agent";
   }, [active]);
   const handleGeneratePlan = () => {
-    const preset = plannerGoalPresets.find((item) => item.id === activePlan);
+    const inferredPlan = inferPlanFromQuestion(plannerQuestion);
+    const preset = plannerGoalPresets.find((item) => item.id === inferredPlan);
+    const profile = dynamicPlanProfiles[inferredPlan];
+    setActivePlan(inferredPlan);
+    setStrategy(profile.strategy);
+    setSelectedFollowUp(profile.followUps[0].question);
     setActiveLayer(preset?.layer ?? "facility");
   };
 
@@ -1271,6 +1365,8 @@ function PlannerDashboard({ active }) {
                 setStrategy(nextStrategy);
                 setActiveLayer("facility");
               }}
+              selectedFollowUp={selectedFollowUp}
+              setSelectedFollowUp={setSelectedFollowUp}
               onGenerate={handleGeneratePlan}
             />
           </section>
