@@ -815,6 +815,557 @@ body { background: var(--planner-bg); }
 .scenario-agent-note p { margin: 0; color: #31515a; font-size: 13px; line-height: 1.8; }
 .export-card { margin: 18px; display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center; }
 
+/* Image 2.0 visual alignment: planner command cockpit */
+:root {
+  --planner-navy: #06233e;
+  --planner-navy-2: #0a3152;
+  --planner-teal: #19b7bd;
+  --planner-teal-dark: #087f8c;
+  --planner-bg: #f3f8fb;
+  --planner-card: #ffffff;
+  --planner-border: #d9e8ef;
+  --planner-muted: #637986;
+  --planner-risk: #f25b3d;
+  --planner-risk-soft: #fff1ec;
+  --planner-cool-soft: #e7fbfb;
+}
+
+body {
+  background:
+    radial-gradient(circle at 88% 4%, rgba(25, 183, 189, .13), transparent 28%),
+    linear-gradient(180deg, #f8fbfd 0%, #eef6f8 100%);
+}
+
+.planner-shell {
+  grid-template-columns: 256px 1fr;
+  background: transparent;
+}
+
+.planner-sidebar {
+  width: 256px;
+  padding: 22px 18px;
+  background:
+    radial-gradient(circle at 24px 24px, rgba(242, 91, 61, .22), transparent 28%),
+    linear-gradient(180deg, #082847 0%, #061d34 100%);
+  box-shadow: 14px 0 34px rgba(6, 35, 62, .14);
+}
+
+.planner-sidebar .brand {
+  padding: 0 0 24px;
+  gap: 13px;
+}
+
+.planner-sidebar .brand__mark {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #ff6a45, #f25b3d 58%, #ff9a72);
+  box-shadow: 0 16px 28px rgba(242, 91, 61, .28);
+}
+
+.planner-sidebar .brand strong {
+  color: #f8feff;
+  font-size: 16px;
+}
+
+.planner-sidebar .brand span {
+  color: #9fc8d5;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.planner-sidebar nav {
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.planner-sidebar .nav-item {
+  min-height: 50px;
+  padding: 0 16px;
+  border-radius: 10px;
+  color: #c7dbe3;
+  font-weight: 700;
+}
+
+.planner-sidebar .nav-item svg {
+  color: #9fd7e1;
+}
+
+.planner-sidebar .nav-item--active {
+  background: linear-gradient(135deg, #ffffff, #effcff);
+  color: var(--planner-navy);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, .18);
+}
+
+.planner-sidebar .nav-item--active svg {
+  color: var(--planner-teal-dark);
+}
+
+.sidebar__foot {
+  padding: 0;
+  gap: 18px;
+}
+
+.sidebar-status-card {
+  display: grid;
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid rgba(110, 201, 215, .24);
+  border-radius: 10px;
+  background: rgba(10, 49, 82, .72);
+}
+
+.sidebar-status-card > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sidebar-status-card b {
+  color: #8ae4e5;
+  font-size: 11px;
+}
+
+.sidebar-team-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+
+.sidebar-team-card svg {
+  padding: 6px;
+  border-radius: 999px;
+  color: #d7f8fa;
+  background: rgba(255,255,255,.12);
+}
+
+.sidebar-team-card strong,
+.sidebar-team-card small {
+  display: block;
+}
+
+.sidebar-team-card strong {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.sidebar-team-card small {
+  margin-top: 3px;
+  color: #9fc8d5;
+}
+
+.app-main {
+  grid-column: 2;
+}
+
+.planner-topbar {
+  height: 72px;
+  padding: 0 28px 0 32px;
+  background: rgba(250, 253, 255, .9);
+  border-bottom: 1px solid rgba(196, 217, 226, .75);
+  box-shadow: 0 1px 0 rgba(255,255,255,.8);
+}
+
+.planner-topbar .topbar__context {
+  gap: 12px;
+}
+
+.planner-topbar .topbar__context span {
+  color: #65808e;
+  font-weight: 600;
+}
+
+.planner-topbar .topbar__context strong {
+  color: var(--planner-navy);
+  font-size: 14px;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.planner-topbar .topbar__status {
+  height: 34px;
+  padding: 0 15px;
+  border: 1px solid #dcebf1;
+  border-radius: 999px;
+  background: rgba(255,255,255,.78);
+  color: #5f7582;
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-weight: 700;
+}
+
+.topbar-icon-button,
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+}
+
+.topbar-icon-button {
+  background: transparent;
+  color: var(--planner-navy);
+}
+
+.topbar-avatar {
+  background: var(--planner-navy);
+  color: #fff;
+  font-weight: 800;
+}
+
+.planner-workspace {
+  max-width: 1620px;
+  padding: 22px 28px 56px;
+}
+
+.planner-hero {
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.planner-risk-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 386px;
+  gap: 18px;
+  align-items: start;
+}
+
+.planner-risk-left {
+  min-width: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.planner-risk-layout .planner-hero,
+.planner-risk-layout .planner-metric-grid {
+  margin-bottom: 0;
+}
+
+.planner-hero--risk {
+  grid-template-columns: 1fr;
+}
+
+.planner-hero--risk > div:first-child {
+  min-height: 186px;
+}
+
+.planner-hero > div:first-child {
+  position: relative;
+  min-height: 170px;
+  overflow: hidden;
+  padding: 28px 36px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 72% 52%, rgba(25, 183, 189, .32), transparent 24%),
+    linear-gradient(135deg, #082849 0%, #083c5c 46%, #0b6c78 100%);
+  box-shadow: 0 22px 44px rgba(6, 35, 62, .18);
+}
+
+.planner-hero > div:first-child::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 50%, #000 100%);
+  opacity: .55;
+}
+
+.planner-hero > div:first-child::after {
+  content: "";
+  position: absolute;
+  right: 118px;
+  top: 35px;
+  width: 220px;
+  height: 110px;
+  transform: rotate(-18deg) skewX(-8deg);
+  background:
+    linear-gradient(90deg, rgba(25,183,189,.55) 1px, transparent 1px),
+    linear-gradient(rgba(25,183,189,.55) 1px, transparent 1px),
+    radial-gradient(circle at 68% 42%, rgba(242,91,61,.95), transparent 12%),
+    radial-gradient(circle at 55% 56%, rgba(255,185,76,.9), transparent 10%),
+    rgba(25,183,189,.11);
+  background-size: 18px 18px, 18px 18px, auto, auto, auto;
+  border: 1px solid rgba(122, 238, 236, .35);
+  box-shadow: 0 20px 52px rgba(25,183,189,.2);
+}
+
+.planner-hero .eyebrow,
+.planner-hero h1,
+.planner-hero p {
+  position: relative;
+  z-index: 1;
+}
+
+.planner-hero .eyebrow {
+  color: #ff8b64;
+  letter-spacing: .08em;
+}
+
+.planner-hero h1 {
+  color: #f7feff;
+  font-size: clamp(42px, 4vw, 62px);
+  text-shadow: 0 8px 28px rgba(0,0,0,.18);
+}
+
+.planner-hero p {
+  max-width: 720px;
+  color: #d8edf2;
+  font-size: 17px;
+}
+
+.planner-hero__skyline {
+  position: absolute;
+  z-index: 1;
+  left: 300px;
+  bottom: 0;
+  width: 420px;
+  height: 92px;
+  opacity: .22;
+  background:
+    linear-gradient(to top, rgba(255,255,255,.85), rgba(255,255,255,.85)) 0 100% / 100% 2px no-repeat,
+    linear-gradient(to top, transparent 0 28px, rgba(255,255,255,.85) 28px 84px, transparent 84px) 18px 100% / 28px 100% no-repeat,
+    linear-gradient(to top, transparent 0 16px, rgba(255,255,255,.85) 16px 66px, transparent 66px) 78px 100% / 48px 100% no-repeat,
+    linear-gradient(to top, transparent 0 36px, rgba(255,255,255,.85) 36px 88px, transparent 88px) 158px 100% / 38px 100% no-repeat,
+    linear-gradient(to top, transparent 0 22px, rgba(255,255,255,.85) 22px 74px, transparent 74px) 226px 100% / 70px 100% no-repeat;
+}
+
+.planner-hero__heat-tile {
+  position: absolute;
+  z-index: 2;
+  right: 34px;
+  top: 72px;
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  color: #e8ffff;
+  font: 800 24px "Cascadia Mono", "Consolas", monospace;
+  border: 2px solid rgba(155, 246, 247, .72);
+  clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+  background: rgba(16, 118, 136, .45);
+  box-shadow: inset 0 0 18px rgba(25, 183, 189, .18);
+}
+
+.planner-hero__note {
+  min-height: 170px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(25,183,189,.18), transparent 32%),
+    var(--planner-navy);
+  box-shadow: 0 20px 42px rgba(6, 35, 62, .16);
+}
+
+.planner-metric-grid {
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.planner-metric {
+  min-height: 116px;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  border-color: transparent;
+  border-radius: 12px;
+  box-shadow: 0 18px 36px rgba(6, 35, 62, .08);
+}
+
+.planner-metric::before {
+  width: 4px;
+  border-radius: 999px;
+}
+
+.planner-metric__icon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--planner-teal), #0d8c95);
+  box-shadow: 0 12px 20px rgba(25,183,189,.22);
+}
+
+.planner-metric--danger .planner-metric__icon {
+  background: linear-gradient(135deg, #ff7a4c, var(--planner-risk));
+  box-shadow: 0 12px 20px rgba(242,91,61,.24);
+}
+
+.planner-metric--warning .planner-metric__icon {
+  background: linear-gradient(135deg, #ffc45a, #f1a439);
+  box-shadow: 0 12px 20px rgba(241,164,57,.24);
+}
+
+.planner-metric--neutral .planner-metric__icon {
+  background: linear-gradient(135deg, #58b0f2, #287ac8);
+  box-shadow: 0 12px 20px rgba(40,122,200,.22);
+}
+
+.planner-metric strong {
+  margin: 5px 0;
+  font-size: 26px;
+  white-space: nowrap;
+}
+
+.planner-main-grid {
+  grid-template-columns: minmax(0, 1fr) 386px;
+  gap: 18px;
+}
+
+.planner-map-card,
+.planner-agent-panel,
+.planner-table-card,
+.planner-section-card {
+  border-color: rgba(205, 225, 233, .92);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 22px 44px rgba(6, 35, 62, .08);
+}
+
+.planner-panel-heading {
+  min-height: 72px;
+  padding: 16px 20px;
+  background: rgba(255,255,255,.88);
+}
+
+.planner-layer-tab {
+  min-height: 34px;
+  padding: 0 14px;
+  border-color: #dcebf1;
+  background: #f3f8fa;
+  color: #708894;
+  font-weight: 700;
+}
+
+.planner-layer-tab--active {
+  background: var(--planner-navy);
+}
+
+.planner-layer-button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid #dcebf1;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--planner-navy);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.real-map-shell {
+  height: 570px;
+}
+
+.map-legend-panel {
+  left: 22px;
+  bottom: 22px;
+  border-radius: 7px;
+  background: rgba(6, 35, 62, .9);
+}
+
+.planner-agent-panel {
+  height: 642px;
+  background: rgba(255,255,255,.95);
+}
+
+.planner-risk-layout .planner-agent-panel {
+  height: 860px;
+}
+
+.planner-agent-heading {
+  align-items: center;
+}
+
+.planner-agent-heading__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.planner-agent-heading__icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--planner-teal-dark);
+  background: linear-gradient(135deg, #e5fbfb, #f2f8ff);
+}
+
+.planner-agent-heading b {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #e7fbfb;
+  color: var(--planner-teal-dark);
+  font-size: 11px;
+}
+
+.agent-goal-box {
+  padding: 16px;
+  background: #fbfdfe;
+}
+
+.agent-goal-box textarea,
+.agent-goal-box select {
+  border-radius: 10px;
+  border-color: #d5e5ec;
+  box-shadow: inset 0 1px 2px rgba(6, 35, 62, .04);
+}
+
+.agent-goal-box textarea {
+  min-height: 118px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.agent-run-button {
+  min-height: 46px;
+  min-width: 128px;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #087f8c, #0b6c93);
+  box-shadow: 0 14px 24px rgba(8, 127, 140, .22);
+}
+
+.agent-run-button:hover {
+  background: linear-gradient(135deg, #0b91a0, #087f8c);
+}
+
+.diagnosis-block--risk {
+  background: #f0fcfc;
+  border-left-color: var(--planner-teal);
+}
+
+.diagnosis-block--advice {
+  background: #e8fbf9;
+}
+
+.agent-boundary-note {
+  margin: 14px 16px 16px;
+  border: 1px solid #d9e8ef;
+  border-radius: 10px;
+  background: #f6fafc;
+}
+
 @media (max-width: 1180px) {
   .planner-hero, .planner-main-grid, .planner-metric-grid { grid-template-columns: 1fr; }
   .planner-hero__note { min-height: 150px; }

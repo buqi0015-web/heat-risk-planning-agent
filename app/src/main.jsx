@@ -4,15 +4,22 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
   AlertTriangle,
+  Bell,
+  Bot,
   Building2,
   CheckCircle2,
+  CircleUserRound,
   Download,
   FileText,
+  Footprints,
   Layers3,
   MapPin,
   Menu,
+  PieChart,
   Route,
+  Settings2,
   ShieldCheck,
+  Sparkles,
   ThermometerSun,
   Users,
   X,
@@ -28,10 +35,10 @@ const NAV_ITEMS = [
 ];
 
 const metricCards = [
-  { label: "高温暴露人口", value: "12.8万人", meta: "午后高温时段暴露估计", tone: "danger" },
-  { label: "设施覆盖率", value: "64%", meta: "15分钟可达清凉设施", tone: "cool" },
-  { label: "平均步行绕行距离", value: "420m", meta: "到达清凉节点的额外距离", tone: "neutral" },
-  { label: "重点人群影响指数", value: "0.78", meta: "老人、儿童、户外劳动者", tone: "warning" },
+  { label: "高温暴露人口", value: "12.8万人", meta: "午后高温时段暴露估计", tone: "danger", icon: Users },
+  { label: "设施覆盖率", value: "64%", meta: "15分钟可达清凉设施", tone: "cool", icon: PieChart },
+  { label: "平均步行绕行距离", value: "420m", meta: "到达清凉节点的额外距离", tone: "neutral", icon: Footprints },
+  { label: "重点人群影响指数", value: "0.78", meta: "老人、儿童、户外劳动者", tone: "warning", icon: Users },
 ];
 
 const diagnosis = {
@@ -256,11 +263,15 @@ function inferPlanFromQuestion(question) {
 }
 
 function MetricCard({ item }) {
+  const Icon = item.icon;
   return (
     <article className={`planner-metric planner-metric--${item.tone}`}>
-      <span>{item.label}</span>
-      <strong>{item.value}</strong>
-      <small>{item.meta}</small>
+      <div className="planner-metric__icon"><Icon aria-hidden="true" size={22} /></div>
+      <div>
+        <span>{item.label}</span>
+        <strong>{item.value}</strong>
+        <small>{item.meta}</small>
+      </div>
     </article>
   );
 }
@@ -287,10 +298,16 @@ function Sidebar({ active, setActive, open, setOpen }) {
         ))}
       </nav>
       <div className="sidebar__foot">
-        <span>项目状态</span>
-        <div className="progress"><span /></div>
-        <strong>Demo mock data</strong>
-        <small>面向责任规划师的高温治理工作台</small>
+        <div className="sidebar-status-card">
+          <div><span>项目状态</span><b>进行中</b></div>
+          <div className="progress"><span /></div>
+          <strong>Demo mock data</strong>
+          <small>面向责任规划师的高温设施规划验证工作台</small>
+        </div>
+        <div className="sidebar-team-card">
+          <CircleUserRound aria-hidden="true" size={34} />
+          <div><strong>高温规划团队</strong><small>规划师</small></div>
+        </div>
       </div>
     </aside>
   );
@@ -307,7 +324,11 @@ function Header({ active, setMenuOpen }) {
         <span>海淀区 · 典型高温日</span>
         <strong>{label}</strong>
       </div>
-      <div className="topbar__status"><span aria-hidden="true" />Agent 诊断已生成</div>
+      <div className="topbar__actions">
+        <div className="topbar__status"><span aria-hidden="true" />Agent 在线 · 运行正常</div>
+        <button className="topbar-icon-button" aria-label="通知"><Bell aria-hidden="true" size={17} /></button>
+        <div className="topbar-avatar" aria-hidden="true">A</div>
+      </div>
     </header>
   );
 }
@@ -728,6 +749,7 @@ function MapLibreHeatMap({ activeLayer, setActiveLayer, strategy }) {
               {label}
             </button>
           ))}
+          <button className="planner-layer-button" type="button"><Settings2 aria-hidden="true" size={14} />图层</button>
         </div>
       </div>
       <div className="real-map-shell">
@@ -977,9 +999,15 @@ function AgentDiagnosisPanel({
 
   return (
     <aside className="planner-agent-panel">
-      <div className="planner-panel-heading planner-panel-heading--stack">
-        <span>目标驱动选址 Agent</span>
-        <h2>把静态候选点转成动态治理方案</h2>
+      <div className="planner-panel-heading planner-agent-heading">
+        <div className="planner-agent-heading__title">
+          <div className="planner-agent-heading__icon"><Bot aria-hidden="true" size={22} /></div>
+          <div>
+            <span>AI 规划助手</span>
+            <h2>把静态候选点转成动态治理方案</h2>
+          </div>
+        </div>
+        <b>高温设施规划 Agent</b>
       </div>
       <section className="agent-goal-box">
         <label htmlFor="planner-question">规划师输入治理目标</label>
@@ -1015,7 +1043,7 @@ function AgentDiagnosisPanel({
             </select>
           </label>
           <button className="planner-export-button agent-run-button" onClick={onGenerate}>
-            生成方案
+            <Sparkles aria-hidden="true" size={15} />生成方案
           </button>
         </div>
       </section>
@@ -1328,33 +1356,36 @@ function PlannerDashboard({ active }) {
     setActiveLayer(preset?.layer ?? "facility");
   };
 
-  return (
-    <main id="main-content" className="planner-workspace">
-      <section className="planner-hero">
-        <div>
-          <span className="eyebrow">Responsible Planner Agent</span>
-          <h1>{pageTitle}</h1>
-          <p>从“哪里热”到“影响了谁、阻碍了什么活动、设施如何响应”</p>
-        </div>
+  const heroSection = (
+    <section className={`planner-hero ${active === "risk" ? "planner-hero--risk" : ""}`}>
+      <div>
+        <span className="eyebrow">Responsible Planner Agent</span>
+        <h1>{pageTitle}</h1>
+        <p>从“哪里热”到“影响了谁、阻碍了什么活动、设施如何响应”</p>
+        <div className="planner-hero__skyline" aria-hidden="true" />
+        <div className="planner-hero__heat-tile" aria-hidden="true"><span>AI</span></div>
+      </div>
+      {active !== "risk" && (
         <div className="planner-hero__note">
           <ShieldCheck size={20} />
           <span>GIS核验空间事实，受约束LLM组织居民活动情境、解释问题并生成可审议证据。</span>
         </div>
-      </section>
+      )}
+    </section>
+  );
 
-      <section className="planner-metric-grid">
-        {metricCards.map((item) => <MetricCard key={item.label} item={item} />)}
-      </section>
-
-      {active === "facility" && <FacilityView />}
-      {active === "route" && <ActivityRouteView />}
-      {active === "scenario" && <CounterfactualView />}
-      {active === "export" && <ExportView />}
-
+  return (
+    <main id="main-content" className="planner-workspace">
       {active === "risk" && (
         <>
-          <section className="planner-main-grid">
-            <MapLibreHeatMap activeLayer={activeLayer} setActiveLayer={setActiveLayer} strategy={strategy} />
+          <section className="planner-risk-layout">
+            <div className="planner-risk-left">
+              {heroSection}
+              <section className="planner-metric-grid">
+                {metricCards.map((item) => <MetricCard key={item.label} item={item} />)}
+              </section>
+              <MapLibreHeatMap activeLayer={activeLayer} setActiveLayer={setActiveLayer} strategy={strategy} />
+            </div>
             <AgentDiagnosisPanel
               activePlan={activePlan}
               setActivePlan={setActivePlan}
@@ -1371,6 +1402,19 @@ function PlannerDashboard({ active }) {
             />
           </section>
           <PlanComparisonTable />
+        </>
+      )}
+
+      {active !== "risk" && (
+        <>
+          {heroSection}
+          <section className="planner-metric-grid">
+            {metricCards.map((item) => <MetricCard key={item.label} item={item} />)}
+          </section>
+          {active === "facility" && <FacilityView />}
+          {active === "route" && <ActivityRouteView />}
+          {active === "scenario" && <CounterfactualView />}
+          {active === "export" && <ExportView />}
         </>
       )}
     </main>
