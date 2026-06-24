@@ -1281,6 +1281,97 @@ body {
   background: rgba(6, 35, 62, .9);
 }
 
+.map-risk-legend {
+  position: absolute;
+  z-index: 2;
+  left: 28px;
+  top: 80px;
+  width: 132px;
+  padding: 13px 14px;
+  border: 1px solid rgba(214, 229, 235, .92);
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  color: var(--planner-navy);
+  box-shadow: 0 16px 34px rgba(6, 35, 62, .12);
+  backdrop-filter: blur(10px);
+  font-size: 11px;
+}
+
+.map-risk-legend strong,
+.map-risk-legend span {
+  display: block;
+}
+
+.map-risk-legend strong {
+  margin-bottom: 11px;
+  font-size: 13px;
+}
+
+.map-risk-legend span {
+  margin: 12px 0 8px;
+  color: #4c6470;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.map-risk-legend__section {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  align-items: center;
+  gap: 8px 7px;
+  color: #5b707b;
+  line-height: 1.2;
+}
+
+.map-risk-legend__section + .map-risk-legend__section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e2edf1;
+}
+
+.map-risk-legend__section span {
+  grid-column: 1 / -1;
+  margin: 0 0 2px;
+}
+
+.risk-level {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.risk-level--critical { background: #e34d37; }
+.risk-level--high { background: #f27a45; }
+.risk-level--medium { background: #ffc665; }
+.risk-level--low { background: #a5d9b6; }
+.risk-level--very-low { background: #56a8a7; }
+
+.facility-dot {
+  width: 10px;
+  height: 10px;
+  justify-self: center;
+  border-radius: 999px;
+  display: inline-block;
+  background: #25a9b2;
+}
+
+.facility-dot--existing {
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #25a9b2;
+}
+
+.facility-dot--planned {
+  background: #2e9be6;
+  box-shadow: 0 0 0 2px rgba(46, 155, 230, .2);
+}
+
+.facility-dot--key {
+  background: #2369bd;
+  clip-path: polygon(50% 0, 62% 34%, 98% 34%, 69% 55%, 80% 91%, 50% 70%, 20% 91%, 31% 55%, 2% 34%, 38% 34%);
+  border-radius: 0;
+}
+
 .planner-agent-panel {
   height: 642px;
   background: rgba(255,255,255,.95);
@@ -1357,6 +1448,38 @@ body {
 
 .diagnosis-block--advice {
   background: #e8fbf9;
+}
+
+.agent-insight-card {
+  margin: 16px;
+  padding: 16px;
+  border: 1px solid #dcebf1;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8fdff, #eefafa);
+}
+
+.agent-insight-card h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--planner-navy);
+}
+
+.agent-insight-card h3 svg {
+  color: var(--planner-teal-dark);
+}
+
+.agent-review-card {
+  margin: 0 16px 16px;
+  padding: 16px;
+  border: 1px solid #dcebf1;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.agent-review-card ul {
+  display: grid;
+  gap: 7px;
 }
 
 .agent-boundary-note {

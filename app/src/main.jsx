@@ -756,6 +756,23 @@ function MapLibreHeatMap({ activeLayer, setActiveLayer, strategy }) {
         <div ref={mapContainerRef} className="real-map" aria-label="海淀区道路热风险地图" />
         {mapState === "loading" && <div className="real-map__state">正在加载道路与热暴露数据...</div>}
         {mapState === "error" && <div className="real-map__state real-map__state--error">地图数据加载失败，请检查 public/data/showcase.json</div>}
+        <div className="map-risk-legend" aria-label="热风险等级与设施节点图例">
+          <strong>图例</strong>
+          <div className="map-risk-legend__section">
+            <span>热风险等级</span>
+            <i className="risk-level risk-level--critical" />极高
+            <i className="risk-level risk-level--high" />高
+            <i className="risk-level risk-level--medium" />中
+            <i className="risk-level risk-level--low" />低
+            <i className="risk-level risk-level--very-low" />极低
+          </div>
+          <div className="map-risk-legend__section">
+            <span>设施节点</span>
+            <em className="facility-dot facility-dot--existing" />现有设施
+            <em className="facility-dot facility-dot--planned" />规划设施
+            <em className="facility-dot facility-dot--key" />重要节点
+          </div>
+        </div>
         <div className="map-legend-panel real-map__legend" aria-label="地图图例">
           <div className="map-legend-group">
             <strong>选址候选点</strong>
@@ -1048,18 +1065,16 @@ function AgentDiagnosisPanel({
         </div>
       </section>
       <div className="agent-result-scroll">
-        <section className="diagnosis-block agent-decomposition-block">
-          <h3>Agent 目标拆解</h3>
-          <div className="agent-decomposition-grid">
-            <div><span>重点人群</span><strong>{plan.decomposition.groups.join("、")}</strong></div>
-            <div><span>活动情境</span><strong>{plan.decomposition.activities.join("、")}</strong></div>
-            <div><span>空间约束</span><strong>{plan.decomposition.constraints.join("、")}</strong></div>
-            <div><span>设施偏好</span><strong>{plan.decomposition.facilities.join("、")}</strong></div>
-          </div>
+        <section className="diagnosis-block agent-insight-card">
+          <h3><Sparkles aria-hidden="true" size={15} />方案洞察</h3>
+          <p>{plan.recommendation}</p>
         </section>
-        <section className="diagnosis-block diagnosis-block--risk">
-          <h3>Agent 判断</h3>
-          <p>{plan.judgement}</p>
+        <section className="diagnosis-block agent-review-card">
+          <h3>待人工核验</h3>
+          <ul>{plan.risks.map((item) => <li key={item}>{item}</li>)}</ul>
+        </section>
+        <section className="agent-boundary-note">
+          LLM 仅负责目标理解、权重排序、方案组织和理由生成；道路热暴露、候选设施和覆盖结果来自 GIS 与规则模型。
         </section>
         <section className="diagnosis-block">
           <h3>推荐设施组合</h3>
@@ -1072,6 +1087,19 @@ function AgentDiagnosisPanel({
               </article>
             ))}
           </div>
+        </section>
+        <section className="diagnosis-block agent-decomposition-block">
+          <h3>Agent 目标拆解</h3>
+          <div className="agent-decomposition-grid">
+            <div><span>重点人群</span><strong>{plan.decomposition.groups.join("、")}</strong></div>
+            <div><span>活动情境</span><strong>{plan.decomposition.activities.join("、")}</strong></div>
+            <div><span>空间约束</span><strong>{plan.decomposition.constraints.join("、")}</strong></div>
+            <div><span>设施偏好</span><strong>{plan.decomposition.facilities.join("、")}</strong></div>
+          </div>
+        </section>
+        <section className="diagnosis-block diagnosis-block--risk">
+          <h3>Agent 判断</h3>
+          <p>{plan.judgement}</p>
         </section>
         <section className="diagnosis-block">
           <h3>策略转译</h3>
@@ -1102,13 +1130,6 @@ function AgentDiagnosisPanel({
             <strong>{activeFollowUp.question}</strong>
             <p>{activeFollowUp.answer}</p>
           </div>
-        </section>
-        <section className="diagnosis-block">
-          <h3>待人工核验</h3>
-          <ul>{plan.risks.map((item) => <li key={item}>{item}</li>)}</ul>
-        </section>
-        <section className="agent-boundary-note">
-          LLM 只负责目标理解、权重转译、方案组织和理由生成；点位、道路热暴露、候选设施和覆盖结果来自 GIS 与规则模型。
         </section>
       </div>
     </aside>
