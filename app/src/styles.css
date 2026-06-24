@@ -1054,7 +1054,8 @@ body {
 }
 
 .planner-hero--risk > div:first-child {
-  min-height: 186px;
+  height: 186px;
+  min-height: 0;
 }
 
 .planner-hero > div:first-child {
@@ -1378,7 +1379,59 @@ body {
 }
 
 .planner-risk-layout .planner-agent-panel {
-  height: 860px;
+  height: 980px;
+  min-height: 0;
+  align-self: start;
+}
+
+@media (max-width: 1500px) {
+  .planner-risk-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .planner-risk-layout .planner-agent-panel {
+    height: 1030px;
+  }
+
+  .planner-metric-grid {
+    gap: 12px;
+  }
+
+  .planner-metric {
+    min-height: 104px;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px 12px;
+  }
+
+  .planner-metric__icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .planner-metric span {
+    font-size: 11px;
+  }
+
+  .planner-metric strong {
+    font-size: 22px;
+  }
+
+  .planner-metric small {
+    font-size: 10px;
+  }
+
+  .planner-agent-heading {
+    gap: 10px;
+  }
+
+  .planner-agent-heading h2 {
+    font-size: 16px;
+  }
+
+  .planner-agent-heading b {
+    max-width: 86px;
+  }
 }
 
 .planner-agent-heading {
@@ -1491,6 +1544,9 @@ body {
 
 @media (max-width: 1180px) {
   .planner-hero, .planner-main-grid, .planner-metric-grid { grid-template-columns: 1fr; }
+  .planner-risk-layout { grid-template-columns: 1fr; }
+  .planner-hero--risk > div:first-child { height: auto; min-height: 150px; }
+  .planner-risk-layout .planner-agent-panel { height: auto; min-height: 0; }
   .planner-hero__note { min-height: 150px; }
   .facility-grid, .activity-grid, .facility-audit-layout, .counterfactual-card-grid, .scenario-step-list, .counterfactual-logic-grid { grid-template-columns: 1fr; }
   .activity-scenario-list article { grid-template-columns: 1fr; align-items: start; }
