@@ -1,0 +1,1180 @@
+{
+  "meta": {
+    "mode": "local-real",
+    "generatedAt": "2026-06-27",
+    "studyArea": "??????",
+    "sources": [
+      "outputs/haidian/site_selection/final_v1/candidate_scores.csv",
+      "outputs/haidian/site_selection/final_v1/failure_hotspot_grid.csv",
+      "outputs/haidian/site_selection/service_gaps/service_gap_summary.json",
+      "outputs/haidian/counterfactual/final_v1/counterfactual_scenario_summary.csv",
+      "outputs/haidian/population/worldpop_haidian_grid_population.csv",
+      "outputs/haidian/poi/poi_core_cooling_candidates.csv",
+      "outputs/haidian/poi/poi_support_cooling_candidates.csv"
+    ],
+    "notes": [
+      "?????????????????????? GIS ???",
+      "??????????????????",
+      "WorldPop ????????????????????????"
+    ]
+  },
+  "diagnosis": {
+    "highRiskZones": [
+      {
+        "zoneId": "hotspot_876_8845",
+        "name": "?????? hotspot_876_8845",
+        "riskLevel": "extreme",
+        "priorityCell": "hotspot_876_8845",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 8 ??",
+        "demandWeight": 107.01
+      },
+      {
+        "zoneId": "hotspot_876_8846",
+        "name": "?????? hotspot_876_8846",
+        "riskLevel": "extreme",
+        "priorityCell": "hotspot_876_8846",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 9 ??",
+        "demandWeight": 103.52
+      },
+      {
+        "zoneId": "hotspot_871_8840",
+        "name": "?????? hotspot_871_8840",
+        "riskLevel": "extreme",
+        "priorityCell": "hotspot_871_8840",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 16 ??",
+        "demandWeight": 99.79
+      },
+      {
+        "zoneId": "hotspot_877_8839",
+        "name": "?????? hotspot_877_8839",
+        "riskLevel": "extreme",
+        "priorityCell": "hotspot_877_8839",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 12 ??",
+        "demandWeight": 99.43
+      },
+      {
+        "zoneId": "hotspot_872_8841",
+        "name": "?????? hotspot_872_8841",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_872_8841",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 11 ??",
+        "demandWeight": 93.62
+      },
+      {
+        "zoneId": "hotspot_875_8837",
+        "name": "?????? hotspot_875_8837",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_875_8837",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 7 ??",
+        "demandWeight": 91.99
+      },
+      {
+        "zoneId": "hotspot_883_8850",
+        "name": "?????? hotspot_883_8850",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_883_8850",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 19 ??",
+        "demandWeight": 91.74
+      },
+      {
+        "zoneId": "hotspot_876_8838",
+        "name": "?????? hotspot_876_8838",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_876_8838",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 18 ??",
+        "demandWeight": 91.37
+      },
+      {
+        "zoneId": "hotspot_875_8844",
+        "name": "?????? hotspot_875_8844",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_875_8844",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 22 ??",
+        "demandWeight": 84.85
+      },
+      {
+        "zoneId": "hotspot_879_8838",
+        "name": "?????? hotspot_879_8838",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_879_8838",
+        "reason": "path ?????????? 清凉驿站;饮水;遮阴;健康服务????? 13 ??",
+        "demandWeight": 79.58
+      },
+      {
+        "zoneId": "hotspot_886_8850",
+        "name": "?????? hotspot_886_8850",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_886_8850",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 3 ??",
+        "demandWeight": 77.89
+      },
+      {
+        "zoneId": "hotspot_879_8839",
+        "name": "?????? hotspot_879_8839",
+        "riskLevel": "high",
+        "priorityCell": "hotspot_879_8839",
+        "reason": "path ?????????? 遮阴;饮水;清凉驿站????? 4 ??",
+        "demandWeight": 77.53
+      }
+    ],
+    "riskLevel": {
+      "hotspot_876_8845": "extreme",
+      "hotspot_876_8846": "extreme",
+      "hotspot_871_8840": "extreme",
+      "hotspot_877_8839": "extreme",
+      "hotspot_872_8841": "high",
+      "hotspot_875_8837": "high",
+      "hotspot_883_8850": "high",
+      "hotspot_876_8838": "high",
+      "hotspot_875_8844": "high",
+      "hotspot_879_8838": "high",
+      "hotspot_886_8850": "high",
+      "hotspot_879_8839": "high"
+    },
+    "priorityCells": [
+      "hotspot_876_8845",
+      "hotspot_876_8846",
+      "hotspot_871_8840",
+      "hotspot_877_8839",
+      "hotspot_872_8841",
+      "hotspot_875_8837",
+      "hotspot_883_8850",
+      "hotspot_876_8838",
+      "hotspot_875_8844",
+      "hotspot_879_8838",
+      "hotspot_886_8850",
+      "hotspot_879_8839"
+    ],
+    "exposedPopulation": 949458,
+    "groupExposureIndex": {
+      "????": 0.609,
+      "??": 0.391,
+      "?????": 0.72
+    },
+    "activityHotspots": [
+      {
+        "id": "hotspot_876_8845",
+        "name": "?????? hotspot_876_8845",
+        "type": "extreme",
+        "group": "??????"
+      },
+      {
+        "id": "hotspot_876_8846",
+        "name": "?????? hotspot_876_8846",
+        "type": "extreme",
+        "group": "??????"
+      },
+      {
+        "id": "hotspot_871_8840",
+        "name": "?????? hotspot_871_8840",
+        "type": "extreme",
+        "group": "??????"
+      },
+      {
+        "id": "hotspot_877_8839",
+        "name": "?????? hotspot_877_8839",
+        "type": "extreme",
+        "group": "??????"
+      },
+      {
+        "id": "hotspot_872_8841",
+        "name": "?????? hotspot_872_8841",
+        "type": "high",
+        "group": "??????"
+      },
+      {
+        "id": "hotspot_875_8837",
+        "name": "?????? hotspot_875_8837",
+        "type": "high",
+        "group": "??????"
+      },
+      {
+        "id": "hotspot_883_8850",
+        "name": "?????? hotspot_883_8850",
+        "type": "high",
+        "group": "??????"
+      },
+      {
+        "id": "hotspot_876_8838",
+        "name": "?????? hotspot_876_8838",
+        "type": "high",
+        "group": "??????"
+      }
+    ]
+  },
+  "facilityAudit": {
+    "existingFacilities": [
+      {
+        "id": "117174",
+        "name": "海淀区社区服务中心万寿路分中心乒乓球馆",
+        "type": "公共休息;清凉中心;高温预警",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.263888,
+          "lat": 39.905694
+        }
+      },
+      {
+        "id": "131635",
+        "name": "安宁里社区党群活动中心",
+        "type": "志愿服务;清凉中心;老人照护;高温预警",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.32937,
+          "lat": 40.046945
+        }
+      },
+      {
+        "id": "142972",
+        "name": "塔干社区党群活动室",
+        "type": "志愿服务;清凉中心;老人照护;高温预警",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.365419,
+          "lat": 39.985517
+        }
+      },
+      {
+        "id": "143307",
+        "name": "羊坊店街道京西社区党群活动中心",
+        "type": "志愿服务;清凉中心;老人照护;高温预警",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.316449,
+          "lat": 39.898089
+        }
+      },
+      {
+        "id": "147715",
+        "name": "田村路街道阜四小院党群活动站",
+        "type": "志愿服务;清凉中心;老人照护;高温预警",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.258821,
+          "lat": 39.928363
+        }
+      },
+      {
+        "id": "150100",
+        "name": "东升镇东部党群活动服务中心",
+        "type": "志愿服务;清凉中心;老人照护;高温预警",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.377086,
+          "lat": 40.035113
+        }
+      },
+      {
+        "id": "269994",
+        "name": "北京同仁堂永泰药店(医保定点药店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.356544,
+          "lat": 40.034098
+        }
+      },
+      {
+        "id": "270202",
+        "name": "北京同仁堂连锁药店(学府畅春药店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.300894,
+          "lat": 39.994436
+        }
+      },
+      {
+        "id": "270222",
+        "name": "仁之堂药店",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.331763,
+          "lat": 39.939095
+        }
+      },
+      {
+        "id": "270251",
+        "name": "弘济药店(杨庄东街店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.198143,
+          "lat": 39.919132
+        }
+      },
+      {
+        "id": "270255",
+        "name": "上庄镇社区卫生服务中心",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.212207,
+          "lat": 40.114117
+        }
+      },
+      {
+        "id": "270288",
+        "name": "甘家口社区卫生服务中心(阜成路北一街)",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.329937,
+          "lat": 39.927375
+        }
+      },
+      {
+        "id": "270292",
+        "name": "北太平庄社区卫生服务中心",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.36315,
+          "lat": 39.950788
+        }
+      },
+      {
+        "id": "270301",
+        "name": "北京国药堂药店(农科三路店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.335222,
+          "lat": 39.960194
+        }
+      },
+      {
+        "id": "270318",
+        "name": "北下关社区卫生服务中心",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.346137,
+          "lat": 39.957249
+        }
+      },
+      {
+        "id": "270355",
+        "name": "茂生堂药店(增光路店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.312867,
+          "lat": 39.928353
+        }
+      },
+      {
+        "id": "270401",
+        "name": "嘉事堂药店(田村半壁店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.261841,
+          "lat": 39.929456
+        }
+      },
+      {
+        "id": "270434",
+        "name": "北京养生堂药店(万寿路店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.295324,
+          "lat": 39.90995
+        }
+      },
+      {
+        "id": "270437",
+        "name": "养生堂药店(中关村西区店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.320206,
+          "lat": 39.981017
+        }
+      },
+      {
+        "id": "270484",
+        "name": "双榆树社区卫生服务中心",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.324697,
+          "lat": 39.96994
+        }
+      },
+      {
+        "id": "270487",
+        "name": "济安堂药店(华清嘉园店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.332354,
+          "lat": 39.992326
+        }
+      },
+      {
+        "id": "270490",
+        "name": "嘉事堂药店(广通苑店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.349362,
+          "lat": 39.945953
+        }
+      },
+      {
+        "id": "270512",
+        "name": "同德堂药店(成府路店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.323973,
+          "lat": 39.992812
+        }
+      },
+      {
+        "id": "270622",
+        "name": "八里庄社区卫生服务中心定慧寺社区卫生服务站",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.280362,
+          "lat": 39.926586
+        }
+      },
+      {
+        "id": "270655",
+        "name": "海淀区上地社区卫生服务站",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.318424,
+          "lat": 40.029872
+        }
+      },
+      {
+        "id": "270690",
+        "name": "嘉事堂药店(环山村路店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.209358,
+          "lat": 40.034927
+        }
+      },
+      {
+        "id": "270693",
+        "name": "嘉事堂药店(玉渊潭南路店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.306289,
+          "lat": 39.913131
+        }
+      },
+      {
+        "id": "270816",
+        "name": "海淀区朱房前街社区卫生服务站",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.32894,
+          "lat": 40.028026
+        }
+      },
+      {
+        "id": "270878",
+        "name": "同仁堂(清华园药店)",
+        "type": "慢病取药;防暑药品",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.325135,
+          "lat": 39.998895
+        }
+      },
+      {
+        "id": "270994",
+        "name": "海淀区万寿路社区卫生服务中心",
+        "type": "应急救助;慢病取药;高温健康咨询",
+        "readiness": "high",
+        "coordinates": {
+          "lon": 116.297259,
+          "lat": 39.915311
+        }
+      }
+    ],
+    "coverageRate": 0.8,
+    "coveredCells": [
+      "hotspot_876_8845",
+      "hotspot_876_8846",
+      "hotspot_871_8840",
+      "hotspot_877_8839",
+      "hotspot_872_8841",
+      "hotspot_875_8837",
+      "hotspot_883_8850",
+      "hotspot_876_8838",
+      "hotspot_875_8844"
+    ],
+    "uncoveredCells": [
+      "hotspot_879_8838",
+      "hotspot_886_8850",
+      "hotspot_879_8839"
+    ],
+    "facilityGaps": [
+      "服务缺口活动 4 条，影响 Agent 4 个",
+      "平均超出服务距离 809 米",
+      "高优先级缺口 1 个，目的：助餐"
+    ],
+    "candidateSearchArea": [
+      "?????? hotspot_876_8845",
+      "?????? hotspot_876_8846",
+      "?????? hotspot_871_8840",
+      "?????? hotspot_877_8839",
+      "?????? hotspot_872_8841"
+    ],
+    "avgWalkDistance": 809.4,
+    "uncoveredPopulation": 189892,
+    "routePressure": [
+      {
+        "routeId": "hotspot_876_8845",
+        "name": "?????? hotspot_876_8845",
+        "pressure": 0.89175
+      },
+      {
+        "routeId": "hotspot_876_8846",
+        "name": "?????? hotspot_876_8846",
+        "pressure": 0.8626666666666666
+      },
+      {
+        "routeId": "hotspot_871_8840",
+        "name": "?????? hotspot_871_8840",
+        "pressure": 0.8315833333333333
+      },
+      {
+        "routeId": "hotspot_877_8839",
+        "name": "?????? hotspot_877_8839",
+        "pressure": 0.8285833333333333
+      },
+      {
+        "routeId": "hotspot_872_8841",
+        "name": "?????? hotspot_872_8841",
+        "pressure": 0.7801666666666667
+      },
+      {
+        "routeId": "hotspot_875_8837",
+        "name": "?????? hotspot_875_8837",
+        "pressure": 0.7665833333333333
+      }
+    ]
+  },
+  "candidateSites": [
+    {
+      "siteId": "candidate_001424",
+      "locationName": "东冉村(公交站)",
+      "address": "114路;121路;33路;360路快车;400路内环;400路外环;400路外环(公益西桥);400路快车内环;400路快车外环;469路;644路;664路;688路;698路;921路;921路",
+      "facilityType": "遮阴",
+      "priority": 1,
+      "coveredPopulation": 4313,
+      "walkDistanceImprovement": 100,
+      "score": 68.1,
+      "evidence": [
+        "覆盖失效需求权重 43.1",
+        "推荐功能：遮阴",
+        "用地语境：商务办公用地;居住用地;教育用地"
+      ],
+      "riskLevel": "high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.275495,
+        "lat": 39.955677
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000750",
+      "locationName": "远大路西口(公交站)",
+      "address": "425路;644路;664路;921路;专75路",
+      "facilityType": "遮阴",
+      "priority": 2,
+      "coveredPopulation": 3990,
+      "walkDistanceImprovement": 92.5,
+      "score": 64.2,
+      "evidence": [
+        "覆盖失效需求权重 39.9",
+        "推荐功能：遮阴",
+        "用地语境：商业服务用地;居住用地"
+      ],
+      "riskLevel": "high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.277361,
+        "lat": 39.956701
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000964",
+      "locationName": "定慧寺西(公交站)",
+      "address": "336路;481路;507路",
+      "facilityType": "遮阴",
+      "priority": 3,
+      "coveredPopulation": 3737,
+      "walkDistanceImprovement": 86.6,
+      "score": 62.2,
+      "evidence": [
+        "覆盖失效需求权重 37.4",
+        "推荐功能：遮阴",
+        "用地语境：公园绿地;商务办公用地;居住用地"
+      ],
+      "riskLevel": "high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.282648,
+        "lat": 39.92434
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000755",
+      "locationName": "远大路(公交站)",
+      "address": "33路;425路;644路;664路;688路;921路",
+      "facilityType": "遮阴",
+      "priority": 4,
+      "coveredPopulation": 3821,
+      "walkDistanceImprovement": 88.6,
+      "score": 62.2,
+      "evidence": [
+        "覆盖失效需求权重 38.2",
+        "推荐功能：遮阴",
+        "用地语境：交通用地;商业服务用地;商务办公用地"
+      ],
+      "riskLevel": "high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.281858,
+        "lat": 39.956984
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000487",
+      "locationName": "世纪金源大饭店海鲜自助餐厅(远大路店)(装修中)",
+      "address": "板井路69号",
+      "facilityType": "饮水;助餐",
+      "priority": 5,
+      "coveredPopulation": 3928,
+      "walkDistanceImprovement": 83.4,
+      "score": 60,
+      "evidence": [
+        "覆盖失效需求权重 39.3",
+        "推荐功能：饮水;助餐",
+        "用地语境：居住用地;工业用地"
+      ],
+      "riskLevel": "high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.280193,
+        "lat": 39.953093
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_001090",
+      "locationName": "海淀黄庄(地铁站)",
+      "address": "10号线;4号线/大兴线",
+      "facilityType": "遮阴",
+      "priority": 6,
+      "coveredPopulation": 3536,
+      "walkDistanceImprovement": 82,
+      "score": 59.8,
+      "evidence": [
+        "覆盖失效需求权重 35.4",
+        "推荐功能：遮阴",
+        "用地语境：居住用地;行政管理用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.317564,
+        "lat": 39.975996
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000463",
+      "locationName": "世纪金源大饭店海鲜自助餐厅(远大路店)(装修中)",
+      "address": "板井路69号",
+      "facilityType": "饮水;助餐",
+      "priority": 7,
+      "coveredPopulation": 3872,
+      "walkDistanceImprovement": 82.1,
+      "score": 59.5,
+      "evidence": [
+        "覆盖失效需求权重 38.7",
+        "推荐功能：饮水;助餐",
+        "用地语境：待核验"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.280685,
+        "lat": 39.953247
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000718",
+      "locationName": "定慧桥东(公交站)",
+      "address": "121路;481路;507路;612路;612路区间;967路",
+      "facilityType": "遮阴",
+      "priority": 8,
+      "coveredPopulation": 3360,
+      "walkDistanceImprovement": 77.9,
+      "score": 59.2,
+      "evidence": [
+        "覆盖失效需求权重 33.6",
+        "推荐功能：遮阴",
+        "用地语境：待核验"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.278442,
+        "lat": 39.924097
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_001012",
+      "locationName": "定慧寺南(公交站)",
+      "address": "634路;89路;专144路",
+      "facilityType": "遮阴",
+      "priority": 9,
+      "coveredPopulation": 3406,
+      "walkDistanceImprovement": 78.9,
+      "score": 58.3,
+      "evidence": [
+        "覆盖失效需求权重 34.1",
+        "推荐功能：遮阴",
+        "用地语境：医疗用地;商务办公用地;居住用地;行政管理用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.284193,
+        "lat": 39.922344
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000674",
+      "locationName": "海淀黄庄东(公交站)",
+      "address": "304路;386路;630路;634路;653路;671路;夜9路",
+      "facilityType": "遮阴",
+      "priority": 10,
+      "coveredPopulation": 3387,
+      "walkDistanceImprovement": 78.5,
+      "score": 58.3,
+      "evidence": [
+        "覆盖失效需求权重 33.9",
+        "推荐功能：遮阴",
+        "用地语境：公园绿地;商务办公用地;居住用地;教育用地;行政管理用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.319359,
+        "lat": 39.976017
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000865",
+      "locationName": "黄庄(公交站)",
+      "address": "334路;33路;360路快车",
+      "facilityType": "遮阴",
+      "priority": 11,
+      "coveredPopulation": 3369,
+      "walkDistanceImprovement": 78.1,
+      "score": 57.7,
+      "evidence": [
+        "覆盖失效需求权重 33.7",
+        "推荐功能：遮阴",
+        "用地语境：待核验"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.279271,
+        "lat": 39.952166
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000570",
+      "locationName": "海淀黄庄南(公交站)",
+      "address": "302路;305路;320路;653路;夜8路",
+      "facilityType": "遮阴",
+      "priority": 12,
+      "coveredPopulation": 3156,
+      "walkDistanceImprovement": 73.2,
+      "score": 55.9,
+      "evidence": [
+        "覆盖失效需求权重 31.6",
+        "推荐功能：遮阴",
+        "用地语境：医疗用地;居住用地;教育用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.318672,
+        "lat": 39.973477
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000861",
+      "locationName": "永定路口北(公交站)",
+      "address": "334路;4路;611路",
+      "facilityType": "遮阴",
+      "priority": 13,
+      "coveredPopulation": 3079,
+      "walkDistanceImprovement": 71.4,
+      "score": 55.1,
+      "evidence": [
+        "覆盖失效需求权重 30.8",
+        "推荐功能：遮阴",
+        "用地语境：待核验"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.264687,
+        "lat": 39.909641
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000825",
+      "locationName": "海淀黄庄西(公交站)",
+      "address": "304路;386路;630路;634路;671路;夜9路;快速直达专线139路;快速直达专线147路",
+      "facilityType": "遮阴",
+      "priority": 14,
+      "coveredPopulation": 2889,
+      "walkDistanceImprovement": 67,
+      "score": 53.5,
+      "evidence": [
+        "覆盖失效需求权重 28.9",
+        "推荐功能：遮阴",
+        "用地语境：商务办公用地;居住用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.314781,
+        "lat": 39.975941
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_001227",
+      "locationName": "远大路(地铁站)",
+      "address": "(在建)12号线",
+      "facilityType": "遮阴",
+      "priority": 15,
+      "coveredPopulation": 2973,
+      "walkDistanceImprovement": 68.9,
+      "score": 53.3,
+      "evidence": [
+        "覆盖失效需求权重 29.7",
+        "推荐功能：遮阴",
+        "用地语境：交通用地;商业服务用地;商务办公用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.282829,
+        "lat": 39.95711
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_001434",
+      "locationName": "定慧桥南(公交站)",
+      "address": "400路内环;400路外环;400路外环(公益西桥);481路;505路;507路;585路;611路;62路;658路;686路;693路;952路;967路;97路;982路;983路;983路区",
+      "facilityType": "遮阴",
+      "priority": 16,
+      "coveredPopulation": 2667,
+      "walkDistanceImprovement": 61.8,
+      "score": 52.3,
+      "evidence": [
+        "覆盖失效需求权重 26.7",
+        "推荐功能：遮阴",
+        "用地语境：待核验"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.275543,
+        "lat": 39.921558
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_001148",
+      "locationName": "恩济西街南站(公交站)",
+      "address": "414路;653路;89路;专144路;夜13路",
+      "facilityType": "遮阴",
+      "priority": 17,
+      "coveredPopulation": 2889,
+      "walkDistanceImprovement": 67,
+      "score": 52.2,
+      "evidence": [
+        "覆盖失效需求权重 28.9",
+        "推荐功能：遮阴",
+        "用地语境：商务办公用地;居住用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.284861,
+        "lat": 39.925777
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000870",
+      "locationName": "恩济东街南口(公交站)",
+      "address": "335路;92路",
+      "facilityType": "遮阴",
+      "priority": 18,
+      "coveredPopulation": 2591,
+      "walkDistanceImprovement": 60.1,
+      "score": 51,
+      "evidence": [
+        "覆盖失效需求权重 25.9",
+        "推荐功能：遮阴",
+        "用地语境：待核验"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.288322,
+        "lat": 39.925014
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_001918",
+      "locationName": "无障碍电梯(知春里地铁站D西南口)",
+      "address": "知春里地铁站D西南口",
+      "facilityType": "遮阴",
+      "priority": 19,
+      "coveredPopulation": 2754,
+      "walkDistanceImprovement": 63.8,
+      "score": 50.9,
+      "evidence": [
+        "覆盖失效需求权重 27.5",
+        "推荐功能：遮阴",
+        "用地语境：商务办公用地;居住用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.32831,
+        "lat": 39.976001
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    },
+    {
+      "siteId": "candidate_000675",
+      "locationName": "知春里(地铁站)",
+      "address": "10号线",
+      "facilityType": "遮阴",
+      "priority": 20,
+      "coveredPopulation": 2754,
+      "walkDistanceImprovement": 63.8,
+      "score": 50.7,
+      "evidence": [
+        "覆盖失效需求权重 27.5",
+        "推荐功能：遮阴",
+        "用地语境：商务办公用地;居住用地"
+      ],
+      "riskLevel": "medium-high",
+      "feasibility": "medium",
+      "manualCheck": [
+        "??????????????",
+        "??????????????",
+        "????????????????"
+      ],
+      "coordinates": {
+        "lon": 116.328709,
+        "lat": 39.976334
+      },
+      "source": "outputs/haidian/site_selection/final_v1/candidate_scores.csv"
+    }
+  ],
+  "scenarios": {
+    "fairnessFirst": {
+      "label": "公平优先",
+      "coverageRate": 0.1406,
+      "exposedPopulationReduced": 39409,
+      "walkDistanceImprovement": 0.22,
+      "costIndex": 0.65,
+      "feasibility": "high",
+      "sourceMethod": "agent_effective_coverage",
+      "scenarioSize": 20,
+      "failedActivityRecoveryRate": 0.0769,
+      "highRiskResolvedRate": 0.0952
+    },
+    "efficiencyFirst": {
+      "label": "效率优先",
+      "coverageRate": 0.2188,
+      "exposedPopulationReduced": 51163,
+      "walkDistanceImprovement": 0.32,
+      "costIndex": 0.65,
+      "feasibility": "high",
+      "sourceMethod": "balanced_network",
+      "scenarioSize": 20,
+      "failedActivityRecoveryRate": 0.0769,
+      "highRiskResolvedRate": 0.0952
+    },
+    "lowCostFirst": {
+      "label": "低成本优先",
+      "coverageRate": 0.1302,
+      "exposedPopulationReduced": 6758,
+      "walkDistanceImprovement": 0.04,
+      "costIndex": 0.65,
+      "feasibility": "high",
+      "sourceMethod": "random",
+      "scenarioSize": 20,
+      "failedActivityRecoveryRate": 0.0385,
+      "highRiskResolvedRate": 0.0952
+    },
+    "emergencyFirst": {
+      "label": "应急优先",
+      "coverageRate": 0.1302,
+      "exposedPopulationReduced": 6758,
+      "walkDistanceImprovement": 0.04,
+      "costIndex": 0.65,
+      "feasibility": "high",
+      "sourceMethod": "random",
+      "scenarioSize": 20,
+      "failedActivityRecoveryRate": 0.0385,
+      "highRiskResolvedRate": 0.0952
+    }
+  },
+  "report": {
+    "selectedPlan": "fairnessFirst",
+    "evidenceSummary": "候选点、设施缺口和方案收益来自海淀本地处理结果；Agent 做结构化编排与方案解释。",
+    "uncertainty": [
+      "开放时间缺失",
+      "设施容量和室内条件未核验",
+      "权属、消防通道和道路红线需现场确认"
+    ],
+    "manualChecklist": [
+      "现场核验候选点空间",
+      "确认开放时间与容量",
+      "确认管理主体",
+      "核验道路安全、消防与无障碍条件"
+    ],
+    "exportStatus": "draft"
+  }
+}
