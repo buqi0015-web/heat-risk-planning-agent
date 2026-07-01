@@ -1,6 +1,5 @@
 import React from "react";
 import { ShieldCheck } from "lucide-react";
-import heroReference from "../assets/hero-reference.png";
 
 function MetricCard({ item }) {
   const Icon = item.icon;
@@ -29,7 +28,7 @@ export function HeroBanner({ title, isRisk = false, showNote = false }) {
     <section className={`planner-hero ${isRisk ? "planner-hero--risk" : ""}`}>
       {isRisk ? (
         <div className="planner-hero-static" role="img" aria-label="高温设施规划 Agent 产品主视觉">
-          <img src={heroReference} alt="" />
+          <div className="planner-hero-static__grid" aria-hidden="true" />
         </div>
       ) : (
         <div>

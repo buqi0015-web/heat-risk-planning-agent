@@ -6,8 +6,6 @@
 
 > Demo 使用预计算 mock data，不需要 API Key。请优先点击上方在线产品 Demo 查看交互页面。
 
-![产品截图](assets/product-demo.png)
-
 ## 产品定位
 
 传统热风险地图能够发现哪里热，但规划师仍需要继续判断：
